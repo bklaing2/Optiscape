@@ -10,6 +10,8 @@ let paused = false
 
 
 function play () {
+  console.log('PLAY MUSIC')
+  return
   paused = false
   
   music.play()
@@ -17,6 +19,8 @@ function play () {
 }
 
 function pause () {
+  console.log('PAUSE MUSIC')
+  return
   paused = true
 
   music.pause()
@@ -24,12 +28,16 @@ function pause () {
 }
 
 function toggle () {
+  console.log('TOGGLE MUSIC')
+  return
   if (paused) play()
   else pause()
 }
 
 
 function changeMusic (src: string) {
+  console.log('CHANGE MUSIC')
+  return
   if (src === music.src) return
   
   music.pause()
@@ -44,6 +52,8 @@ function changeMusic (src: string) {
 
 
 function addAmbience (src: string) {
+  console.log('ADD AMBIENCE')
+  return
   if (ambiences.has(src)) return
 
   const ambience = new Audio(src)
@@ -56,6 +66,8 @@ function addAmbience (src: string) {
 
 
 function removeAmbience (src: string) {
+  console.log('REMOVE AMBIENCE')
+  return
   const ambience = ambiences.get(src)
   if (!ambience) return
   
@@ -66,6 +78,8 @@ function removeAmbience (src: string) {
 
 
 function playSfx (src: string) {
+  console.log('PLAY SFX')
+  return
   if (!src || paused) return
 
   const audio = new Audio(src)

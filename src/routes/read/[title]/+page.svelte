@@ -1,48 +1,69 @@
 <script lang="ts">
-  import { onMount } from 'svelte'
-	import type { Book as EpubBook } from 'epubjs'
-	// import RollingAverage from '$lib/util/rollingAverage'
-	// import KeyframeView, { type Keyframe } from './Keyframe.svelte'
-	// import KeyframeEditor from './KeyframeEditor.svelte'
-	// import sounds from '$lib/util/sounds';
+	import type { PageData } from './$types';
+	import type { Keyframe } from '$lib/keyframe/Keyframe.svelte'
+	import sounds from '$lib/util/sounds';
   
 	import cfi from '$lib/util/cfi'
   import bookUtil from '$lib/util/book'
-	import storage from '$lib/util/storage.js'
-	import type { Book } from '$lib/book/Book.svelte'
-	import Reader from '$lib/book/Reader.svelte'
-
-  export let data
-	let book: EpubBook
+	import { updateHistory, updateReadingRate } from '$lib/util/storage.js'
+	import Reader, { type CfiLocation } from '$lib/book/Reader.svelte'
 
 
+	export let data: PageData
+	$: ({ saveData, metadata, epub, script, readingRate } = data)
+	
+	let startTime = Number.NEGATIVE_INFINITY
 
-  let history: Book[] = []
+
+	function onPageTurn ({ start, end }: CfiLocation) {
+		saveData.location = start
+		saveData.percentage = epub.locations.percentageFromCfi(end)
+		updateHistory(saveData)
+
+		// Update reading rate
+		handleReadingRate(start, end)
+		updateReadingRate(readingRate)
+
+		clearPendingKeyframes()
+		handleKeyframes(start, end)
+	}
+
+	async function handleReadingRate (start: string, end: string) {
+		// Calculate reading rate
+		const elapsedMinutes = (Date.now() - startTime) / 60000
+		if (elapsedMinutes > 0.25 && elapsedMinutes < 10)
+			readingRate.push(characterCount / elapsedMinutes)
 
 
-  let bookInfo: Book
+		// Set up next reading rate
+		startTime = Date.now()
+		characterCount = await cfi.countChars(start, end, epub)
+	}
+
   
 	let keyframes: Keyframe[] = []
 	let pendingKeyframes: NodeJS.Timeout[] = []
   
-	// const cpm = new RollingAverage(5)
   
+	function clearPendingKeyframes () {
+		pendingKeyframes.forEach(clearTimeout)
+		pendingKeyframes = []
+	}
 
-	// onMount(() => {
-	// 	loadData()
-	// 	return saveData
-	// })
+	async function handleKeyframes (start: string, end: string) {
+		keyframes.forEach(async kf => {
+			if (cfi.inRange(kf.start, start, end))
+				startKeyframe(kf, start)
 
-	// // Handle CPM and Keyframes
-	// rendition.on('relocated', async ({ start: { cfi: start }, end: { cfi: end } }: any) => {
-  //   bookInfo.cfi = start
-  //   const percentage = book.locations.percentageFromCfi(end)
-  //   if (percentage) bookInfo.percentage = percentage
-	// 	// handleCPM(start, end)
+			if (cfi.inRange(kf.end, start, end))
+				endKeyframe(kf, start)
+		})
+	}
 
-	// 	// clearPendingKeyframes()
-	// 	// handleKeyframes(start, end)
-	// })
+
+
+
+
 
 	// // Add keyframe
 	// rendition.on("selected", async (cfiRange: string) => {
@@ -63,126 +84,60 @@
 
 
 
-	let startTime = Number.NEGATIVE_INFINITY
 	let characterCount: number
 
-	// async function handleCPM (start: string, end: string) {
-	// 	// Calculate reading rate
-	// 	const elapsedMinutes = (Date.now() - startTime) / 60000
-	// 	if (elapsedMinutes > 0.25 && elapsedMinutes < 10)
-	// 		cpm.push(characterCount / elapsedMinutes)
 
+	async function startKeyframe (kf: Keyframe, start: string) {
+		const offset = await cfi.countChars(start, kf.start, epub)
+		const delay = offset / readingRate.Average * 60000
 
-	// 	// Set up next reading rate
-	// 	startTime = Date.now()
-	// 	characterCount = await cfi.countChars(start, end, book)
-	// }
+		const t = setTimeout (() => {
+			switch (kf.type) {
+				case 'music':
+					sounds.changeMusic(kf.src)
+					break
 
+				case 'ambience':
+					sounds.addAmbience(kf.src)
+					break
 
-	// async function handleKeyframes (start: string, end: string) {
-	// 	keyframes.forEach(async kf => {
-	// 		if (cfi.inRange(kf.start, start, end))
-	// 			startKeyframe(kf, start)
+				case 'sfx':
+					sounds.playSfx(kf.src)
+					break
+			}
+		}, delay)
 
-	// 		if (cfi.inRange(kf.end, start, end))
-	// 			endKeyframe(kf, start)
-	// 	})
-	// }
-
-
-	// async function startKeyframe (kf: Keyframe, start: string) {
-	// 	const offset = await cfi.countChars(start, kf.start, book)
-	// 	const delay = offset / cpm.Average * 60000
-
-	// 	const t = setTimeout (() => {
-	// 		switch (kf.type) {
-	// 			case 'music':
-	// 				sounds.changeMusic(kf.src)
-	// 				break
-
-	// 			case 'ambience':
-	// 				sounds.addAmbience(kf.src)
-	// 				break
-
-	// 			case 'sfx':
-	// 				sounds.playSfx(kf.src)
-	// 				break
-	// 		}
-	// 	}, delay)
-
-	// 	pendingKeyframes.push(t)
-	// }
-
-	// async function endKeyframe (kf: Keyframe, start: string) {
-	// 	const offset = await cfi.countChars(start, kf.end, book)
-	// 	const delay = offset / cpm.Average * 60000
-
-	// 	setTimeout (() => {
-	// 		switch (kf.type) {
-	// 			case 'music':
-	// 				if (sounds.currentlyPlaying === kf.src) sounds.changeMusic('')
-	// 				break
-
-	// 			case 'ambience':
-	// 				sounds.removeAmbience(kf.src)
-	// 				break
-	// 		}
-	// 	}, delay)
-	// }
-
-	// function clearPendingKeyframes () {
-	// 	pendingKeyframes.forEach(clearTimeout)
-	// 	pendingKeyframes = []
-	// }
-
-
-
-
-	// window.addEventListener('unload', async () => {
-	// 	await saveData()
-	// })
-
-	function loadData () {
-    let storedData = localStorage.getItem('history')
-		if (storedData) history = JSON.parse(storedData)
-
-
-    const info = history.find(b => data.title === b.title.replaceAll(' ', '-').toLowerCase())
-    if (info) bookInfo = info
-    // else bookUtil.getInfo(book).then(b => bookInfo = b)
-
-		storedData = localStorage.getItem('keyframes')
-		if (storedData) keyframes = JSON.parse(storedData)
-
-		// data = localStorage.getItem('cpm')
-		// if (data) cpm = JSON.parse(data)
-
-
-		// rendition.on('started', () => {
-		// 	const cfi = bookInfo.cfi
-		// 	if (!cfi) return
-
-		// 	rendition.display(cfi)
-		// })
+		pendingKeyframes.push(t)
 	}
 
-	async function saveData () {
-    storage.updateHistory(bookInfo, history)
-    
-    localStorage.setItem('history', JSON.stringify(history))
-		localStorage.setItem('keyframes', JSON.stringify(keyframes))
-		// localStorage.setItem('cpm', JSON.stringify(cpm))
+	async function endKeyframe (kf: Keyframe, start: string) {
+		const offset = await cfi.countChars(start, kf.end, epub)
+		const delay = offset / readingRate.Average * 60000
+
+		setTimeout (() => {
+			switch (kf.type) {
+				case 'music':
+					if (sounds.currentlyPlaying === kf.src) sounds.changeMusic('')
+					break
+
+				case 'ambience':
+					sounds.removeAmbience(kf.src)
+					break
+			}
+		}, delay)
 	}
 </script>
 
 
 <svelte:head>
-	<title>Read</title>
+	<title>Reading {metadata.title}</title>
 	<meta name="description" content="About this app" />
 </svelte:head>
 
+<svelte:window on:beforeunload={epub.destroy} />
 
 <Reader
-	title={data.title}
-	on:loaded={e => book = e.detail.book}
+	{epub}
+	location={saveData.location}
+	on:pageTurned={e => onPageTurn(e.detail)}
 />

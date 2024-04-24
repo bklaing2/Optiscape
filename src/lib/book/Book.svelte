@@ -1,38 +1,64 @@
 <script lang="ts" context="module">
 	export type Book = {
-    id: string
-		title: string
-		author: string
-		coverUrl?: string | null
-    cfi?: string
+    title: string
+    location?: string
 		percentage?: number
 	};
+  
+  export type BookMetadata = {
+    id: string
+    title: string
+    author: string
+    coverUrl?: string | null
+  }
+
 </script>
 
 <script lang="ts">
-  import { createEventDispatcher } from 'svelte';
+	import { onMount } from "svelte";
+	import ePub from "epubjs";
 
-  const dispatch = createEventDispatcher<{ click: Book }>()
 
-  export let book: Book = { id: '', title: '', author: '' }
+  export let book: Book = { title: ''}
   export let height = 200
+  export let className = ''
+  
+  let metadata: BookMetadata = { id: '', title: '', author: '', coverUrl: null }
 
   $: percentage = book.percentage ? book.percentage : -1
+  $: href = `/read/${book.title}`
+
+
+  onMount (async () => {
+    const response = await fetch(`/api/optiscapes/${book.title}/epub`)
+
+    const epub = ePub(await response.arrayBuffer())
+    await epub.ready
+
+    const meta = epub.packaging.metadata
+
+    metadata = {
+      id: meta.identifier,
+      title: meta.title,
+      author: meta.creator,
+      coverUrl: await epub.coverUrl()
+    }
+  })
 </script>
 
 
-<div class="card">
-  <button
-    on:click={() => dispatch('click', book)}
+<div class={`relative ${className}`}>
+  <a
+    {href}
     class="book"
-    style:background-image={`url(${book.coverUrl})`}
+    style:background-image={`url(${metadata.coverUrl})`}
     style:height={`${height}px`}>
 
     <div class="details">
-      <h3 class="text title">{book.title}</h3>
-      <p class="text author">{book.author}</p>
+      <h3 class="text title">{metadata.title}</h3>
+      <p class="text author">{metadata.author}</p>
     </div>
-  </button>
+  </a>
   
   {#if percentage > 0.01 && percentage < 0.98}
     <div class="percentage">
@@ -43,9 +69,6 @@
 
 
 <style>
-  .card {
-    position: relative;
-  }
 
   .book {
     width: 100%;

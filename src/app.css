@@ -1,3 +1,19 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+
+a {
+  display: block;
+  text-decoration: none;
+}
+
+ul {
+  list-style: none;
+}
+
+.sideways {
+	text-align: center;
+	writing-mode: tb-rl;
+	transform: rotate(-180deg);
+}

@@ -1,11 +1,17 @@
-class RollingAverage {
-  private data: number[] = []
+export interface IRollingAverage {
+  data: number[]
+  windowSize: number
+  outlierCount: number
+}
 
-  private windowSize: number
-  private outlierCount = 0
+
+class RollingAverage implements IRollingAverage {
+  data: number[]
+  windowSize: number
+  outlierCount: number
 
 
-  public get Data() { return this.data }
+  public get Data () { return this.data }
   
 
   public get Average () {
@@ -30,9 +36,11 @@ class RollingAverage {
   }
 
 
-  constructor (windowSize: number) {
+  constructor (data: number[] = [], windowSize = 5, outlierCount = 0) {
     if (windowSize <= 0) throw new Error('Window size must be greater than 0')
+    this.data = data
     this.windowSize = windowSize
+    this.outlierCount = outlierCount
   }
 
 
