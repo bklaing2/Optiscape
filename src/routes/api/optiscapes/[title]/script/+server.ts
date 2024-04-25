@@ -1,10 +1,14 @@
 import fs from 'fs/promises'
 import path from 'path'
+import type { Config } from '@sveltejs/adapter-vercel';
 import { json, error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { AUDIO_CATEGORIES, OPTISCAPES_DIR } from '$lib/constants';
 import type { Script, ScriptPatchBody } from '$lib/types';
 
+export const config: Config = {
+	runtime: 'nodejs18.x',
+};
 
 export const GET: RequestHandler = async ({ params, setHeaders }) => {
   const filePath = path.resolve(OPTISCAPES_DIR, params.title, 'script.json')

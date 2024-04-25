@@ -1,11 +1,15 @@
 import { existsSync } from 'fs'
 import fs from 'fs/promises'
 import path from 'path'
+import type { Config } from '@sveltejs/adapter-vercel';
 import { json, error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { AUDIO_CATEGORIES, OPTISCAPES_DIR } from '$lib/constants';
 import type { Audio } from '$lib/types';
 
+export const config: Config = {
+	runtime: 'nodejs18.x',
+};
 
 export const GET: RequestHandler = async ({ params, url, setHeaders }) => {
   const { searchParams } = url
