@@ -12,8 +12,8 @@
 		<ul class="flex gap-4">
 			<NavLink href="/">Home</NavLink>
 			<NavLink href="/books">Books</NavLink>
-			<NavLink href="/about">About</NavLink>
-			<NavLink href="/sverdle">Contribute</NavLink>
+			<!-- <NavLink href="/about">About</NavLink> -->
+			<!-- <NavLink href="/sverdle">Contribute</NavLink> -->
 		</ul>
 	</nav>
 </header>

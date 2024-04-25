@@ -2,7 +2,7 @@
   import { page } from '$app/stores';  
   import type { Audio } from '$lib/types'
 	import type { Keyframe } from './Keyframe.svelte'
-	import Modal from '../../routes/about/Modal.svelte'
+	import Modal from '$lib/Modal.svelte'
 
   export let show = false
   export let keyframe: Partial<Keyframe>

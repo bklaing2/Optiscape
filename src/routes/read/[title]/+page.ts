@@ -24,12 +24,12 @@ export const load: PageLoad = async ({ params, url, data, fetch }) => {
 
   const history = storage.loadHistory()
   const saveData: Book = history.find(b => params.title === b.title) ?? { title: params.title }
-  if (saveData.location) url.searchParams.set('location', saveData.location)
+  const location = url.searchParams.get('location') ?? saveData.location
   const readingRate = storage.loadReadingRate()
 
   
   return {
-    location: saveData.location,
+    location,
     metadata,
     epub,
     script: data.script,

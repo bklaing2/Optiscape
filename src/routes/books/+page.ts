@@ -1,6 +1,6 @@
 import type { PageLoad } from './$types';
-import { getAllBooks } from '$lib/util/book';
+import type { Book } from '$lib/book/Book.svelte';
 
-export const ssr = false
-
-export const load: PageLoad = async () => ({ books: await getAllBooks() })
+export const load: PageLoad = ({ data }) => {
+  return { optiscapes: data.optiscapes as Book[] }
+}

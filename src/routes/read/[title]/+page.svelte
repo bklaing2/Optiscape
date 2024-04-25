@@ -25,6 +25,7 @@
   
 
 	function onPageTurn ({ start, end }: PageTurned) {
+		location = start
 		$page.url.searchParams.set('location', start)
 		updateHistory($page.params.title, start, epub.locations.percentageFromCfi(end))
 
@@ -149,3 +150,6 @@
 	{location}
 	on:pageTurned={e => onPageTurn(e.detail)}
 />
+
+
+<a href="/edit/{$page.params.title}?location={location}" class="absolute top-0 right-0 py-2 px-5 rounded-full border border-transparent bg-orange-200/30 hover:text-amber-900 hover:bg-orange-200/50 hover:border-amber-900/20">Edit this!</a>

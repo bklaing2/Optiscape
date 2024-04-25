@@ -3,9 +3,9 @@
 	import BookList from '$lib/book/List.svelte'
 
 	export let data: PageData
-	$: ({ books } = data)
+	$: ({ optiscapes } = data)
 </script>
 
 
 <h1>Optiscape books</h1>
-<BookList {books} height={180} className="col-span-full" />
+<BookList books={optiscapes} height={180} className="col-span-full" />

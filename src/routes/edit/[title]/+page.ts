@@ -5,7 +5,7 @@ import ePub from 'epubjs'
 
 export const ssr = false
 
-export const load: PageLoad = async ({ params, data, fetch }) => {
+export const load: PageLoad = async ({ params, url, data, fetch }) => {
   const fetchEpub = await fetch(`/api/optiscapes/${params.title}/epub`)
   if (fetchEpub.status !== 200) throw error(fetchEpub.status, fetchEpub.statusText);
 
@@ -21,7 +21,7 @@ export const load: PageLoad = async ({ params, data, fetch }) => {
   }
   
   const history = storage.loadEditHistory()
-  const location = history[params.title]
+  const location = url.searchParams.get('location') ?? history[params.title]
   
   return {
     metadata,
