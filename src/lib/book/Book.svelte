@@ -1,6 +1,6 @@
 <script lang="ts" context="module">
 	export type Book = {
-    title: string
+    id: string
     location?: string
 		percentage?: number
 	};
@@ -17,22 +17,21 @@
 <script lang="ts">
 	import { onMount } from "svelte";
 	import ePub from "epubjs";
+	import { getEpubLink } from "$lib/util/generateLink";
 
 
-  export let book: Book = { title: ''}
+  export let book: Book = { id: '' }
   export let height = 200
   export let className = ''
   
   let metadata: BookMetadata = { id: '', title: '', author: '', coverUrl: null }
 
   $: percentage = book.percentage ? book.percentage : -1
-  $: href = `/read/${book.title}`
+  $: href = `/read/${book.id}`
 
 
   onMount (async () => {
-    const response = await fetch(`/api/optiscapes/${book.title}/epub`)
-
-    const epub = ePub(await response.arrayBuffer())
+    const epub = ePub(getEpubLink(book.id))
     await epub.ready
 
     const meta = epub.packaging.metadata

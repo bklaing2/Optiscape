@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { page } from '$app/stores';
 	import type { PageData } from './$types';
-	import type { AudioCategory, Keyframe, KeyframeRange, PageTurned } from '$lib/types'
+	import type { AudioCategory, DBKeyframe, Keyframe, KeyframeRange, PageTurned } from '$lib/types/types'
 	import sounds from '$lib/util/sounds';
 	import cfi from '$lib/util/cfi'
 	import { updateHistory, updateReadingRate } from '$lib/util/storage.js'
@@ -9,17 +9,13 @@
   
 
 	export let data: PageData
-	$: ({ location, metadata, epub, script, readingRate } = data)
+	$: ({ location, metadata, epub, readingRate } = data)
 
 	let characterCount: number
 	let startTime = Number.NEGATIVE_INFINITY
 	let pendingKeyframes = {
 		start: [] as NodeJS.Timeout[],
-		end: [] as {
-			timeout: NodeJS.Timeout,
-			kf: KeyframeRange	
-			type: AudioCategory
-		}[]
+		end: [] as { timeout: NodeJS.Timeout; kf: DBKeyframe }[]
 	}
   
   
@@ -27,7 +23,7 @@
 	function onPageTurn ({ start, end }: PageTurned) {
 		location = start
 		$page.url.searchParams.set('location', start)
-		updateHistory($page.params.title, start, epub.locations.percentageFromCfi(end))
+		updateHistory($page.params.id, start, epub.locations.percentageFromCfi(end))
 
 		// Update reading rate
 		handleReadingRate(start, end)
@@ -52,48 +48,39 @@
 	
 
 	async function handleKeyframes (start: string, end: string) {
-		const { sfx, ambience, music } = script
+		// Fetch key frames in range from db
+		const startPercentage = epub.locations.percentageFromCfi(start)
+		const endPercentage = epub.locations.percentageFromCfi(end)
+		const response = await fetch(`/api/optiscapes/${$page.params.id}/script?start=${startPercentage}&end=${endPercentage}`)
+		const script = await response.json() as DBKeyframe[]
 
-		for (const kf of sfx) {
-			if (cfi.inRange(kf.start, start, end))
-				startKeyframe(kf, 'sfx', start)
-		}
-		
-		for (const kf of ambience) {
-			if (cfi.inRange(kf.start, start, end))
-				startKeyframe(kf, 'ambience', start)
-
-			if (cfi.inRange(kf.end, start, end))
-				endKeyframe(kf, 'ambience', start)
-		}
-		
-		for (const kf of music) {
-			if (cfi.inRange(kf.start, start, end))
-				startKeyframe(kf, 'music', start)
-
-			if (cfi.inRange(kf.end, start, end))
-				endKeyframe(kf, 'music', start)
+		for (const kf of script) {
+			startKeyframe(kf, start, end)	
+			endKeyframe(kf, start, end)
 		}
 	}
+
 	
 
-	async function startKeyframe (kf: Keyframe, type: AudioCategory, start: string) {
+	async function startKeyframe (kf: DBKeyframe, start: string, end: string) {
+		if (!cfi.inRange(kf.start, start, end)) return
+
 		const offset = await cfi.countChars(start, kf.start, epub)
 		const delay = offset / readingRate.Average * 60000
 
 		const t = setTimeout (() => {
 
-			switch (type) {
+			switch (kf.category) {
 				case 'music':
-					sounds.changeMusic(kf.src)
+					sounds.changeMusic(kf.source)
 					break
 
 				case 'ambience':
-					sounds.addAmbience(kf.src)
+					sounds.addAmbience(kf.source)
 					break
 
 				case 'sfx':
-					sounds.playSfx(kf.src)
+					sounds.playSfx(kf.source)
 					break
 			}
 		}, delay)
@@ -102,25 +89,24 @@
 	}
 
 
-	async function endKeyframe (kf: KeyframeRange, type: AudioCategory, start: string) {
-		if (type === 'sfx') return
+	async function endKeyframe (kf: DBKeyframe, start: string, end: string) {
+		if (!kf.end || cfi.inRange(kf.end, start, end)) return
 
 		const offset = await cfi.countChars(start, kf.end, epub)
 		const delay = offset / readingRate.Average * 60000
 
-		const t = setTimeout (() => onEndKeyFrame(kf, type), delay)
-		pendingKeyframes.end.push({ timeout: t, kf, type})
+		const t = setTimeout (() => onEndKeyFrame(kf), delay)
+		pendingKeyframes.end.push({ timeout: t, kf })
 	}
 
-	function onEndKeyFrame (kf: KeyframeRange, type: AudioCategory) {
-
-		switch (type) {
+	function onEndKeyFrame (kf: DBKeyframe) {
+		switch (kf.category) {
 			case 'music':
-				sounds.endMusic(kf.src)
+				sounds.endMusic(kf.source)
 				break
 
 			case 'ambience':
-				sounds.removeAmbience(kf.src)
+				sounds.removeAmbience(kf.source)
 				break
 		}
 	}
@@ -130,9 +116,9 @@
 		pendingKeyframes.start.forEach(clearTimeout)
 		pendingKeyframes.start = []
 
-		pendingKeyframes.end.forEach(({ timeout, kf, type }) => {
+		pendingKeyframes.end.forEach(({ timeout, kf }) => {
 			clearTimeout(timeout)
-			onEndKeyFrame(kf, type)
+			onEndKeyFrame(kf)
 		})
 	}
 </script>
@@ -152,4 +138,4 @@
 />
 
 
-<a href="/edit/{$page.params.title}?location={location}" class="absolute top-0 right-0 py-2 px-5 rounded-full border border-transparent bg-orange-200/30 hover:text-amber-900 hover:bg-orange-200/50 hover:border-amber-900/20">Edit this!</a>
+<a href="/edit/{$page.params.id}?location={location}" class="absolute top-0 right-0 py-2 px-5 rounded-full border border-transparent bg-orange-200/30 hover:text-amber-900 hover:bg-orange-200/50 hover:border-amber-900/20">Edit this!</a>

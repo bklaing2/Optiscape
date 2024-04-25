@@ -7,7 +7,7 @@
   import type { Book, Contents, Rendition } from 'epubjs'
 	import cfi from '$lib/util/cfi'
 	import ReaderNav from '$lib/buttons/ReaderNav.svelte';
-	import type { Relocated, Selected } from '$lib/types';
+	import type { Relocated, Selected } from '$lib/types/types';
 	import sounds from '$lib/util/sounds';
 
 

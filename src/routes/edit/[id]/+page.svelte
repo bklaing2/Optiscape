@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { page } from '$app/stores';
 	import type { PageData } from './$types';
-	import type { PageTurned, Selection } from '$lib/types';
+	import type { PageTurned, Selection } from '$lib/types/types';
 	import type { Keyframe } from '$lib/keyframe/Keyframe.svelte'
 	import { updateEditHistory } from '$lib/util/storage';
 	import KeyframeEditor from '$lib/keyframe/KeyframeEditor.svelte';
@@ -9,7 +9,7 @@
 	
 
 	export let data: PageData
-	$: ({ metadata, epub, script, audio, location } = data)
+	$: ({ metadata, epub, audio, location } = data)
 	let showTooltip = false
 
 	let showKeyframeEditor = false
@@ -21,9 +21,11 @@
 
 		if (!keyframe.cfiStart) {
 			keyframe.cfiStart = selection.start
+			keyframe.percentageStart = epub.locations.percentageFromCfi(selection.start)
 			keyframe.snippetStart = snippet
 		} else {
 			keyframe.cfiEnd = selection.end
+			keyframe.percentageEnd = epub.locations.percentageFromCfi(selection.end)
 			keyframe.snippetEnd = snippet
 		}
 		

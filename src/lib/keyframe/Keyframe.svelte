@@ -7,6 +7,8 @@
 		cfiEnd: string
 		snippetStart: string
 		snippetEnd: string
+		percentageStart: number
+		percentageEnd: number
 	};
 </script>
 
@@ -20,11 +22,8 @@
 
 
 <div class="container">
-	<button
-		class="snippet"
-		on:click={() => dispatch('click', keyframe)}
-		>
-		{keyframe.snippet}
+	<button class="snippet" on:click={() => dispatch('click', keyframe)}>
+		{keyframe.snippetStart}
 	</button>
 
 	<div class="buttons">

@@ -1,5 +1,4 @@
 import type { PageLoad } from './$types';
-import type { Book } from '$lib/book/Book.svelte';
 import storage from '$lib/util/storage';
 
 export const ssr = false
@@ -11,6 +10,6 @@ export const load: PageLoad = ({ data }) => {
   return {
     currentlyReading: isCurrentlyReading ? history[0] : undefined, 
     history: isCurrentlyReading ? history.toSpliced(0, 1) : history,
-    optiscapes: data.optiscapes as Book[]
+    optiscapes: data.optiscapes
   }
 }

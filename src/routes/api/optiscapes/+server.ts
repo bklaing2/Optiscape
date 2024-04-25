@@ -1,14 +1,13 @@
-import fs from 'fs/promises'
-import type { Config } from '@sveltejs/adapter-vercel';
-import { json } from '@sveltejs/kit';
+import { json, error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
-import { OPTISCAPES_DIR } from '$lib/constants';
 
-export const config: Config = {
-	runtime: 'nodejs18.x',
-};
 
-export const GET: RequestHandler = async () => {
-	const optiscapes = await fs.readdir(OPTISCAPES_DIR)
-	return json(optiscapes.map(title => ({ title })))
+export const GET: RequestHandler = async ({ locals }) => {
+	const { supabase } = locals
+	const response = await supabase
+		.from('books')
+		.select('*')
+
+	if (response.error) error(500, response.error.message)
+	return json(response.data)
 };

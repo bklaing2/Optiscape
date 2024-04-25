@@ -1,5 +1,5 @@
 import type { Contents } from "epubjs";
-import type { AUDIO_CATEGORIES } from "./constants";
+import type { AUDIO_CATEGORIES } from "../constants";
 
 export type AudioCategory = typeof AUDIO_CATEGORIES[number]
 
@@ -54,5 +54,18 @@ export interface PageTurned {
 
 export type ScriptPatchBody = {
   type: AudioCategory
-  keyframeRange: KeyframeRange
+  keyframeRange: DBKeyframe
+}
+
+
+
+export interface DBKeyframe {
+  book_id: string;
+  category: "sfx" | "ambience" | "music";
+  end: string | null;
+  end_percentage: number;
+  id: number;
+  source: string;
+  start: string;
+  start_percentage: number;
 }

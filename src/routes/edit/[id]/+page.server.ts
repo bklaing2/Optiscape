@@ -1,17 +1,12 @@
 import { error, fail } from '@sveltejs/kit';
 import type { PageServerLoad, Actions } from './$types';
-import type { Audio, Script, ScriptPatchBody } from '$lib/types';
+import type { Audio, DBKeyframe, Script } from '$lib/types/types';
 
 export const load: PageServerLoad = async ({ params, fetch }) => {
-  const fetchScript = await fetch(`/api/optiscapes/${params.title}/script`)
-  if (fetchScript.status !== 200) throw error(fetchScript.status, fetchScript.statusText);
-
-  const fetchAudio = await fetch(`/api/optiscapes/${params.title}/audio`)
+  const fetchAudio = await fetch(`/api/optiscapes/${params.id}/audio`)
   if (fetchAudio.status !== 200) throw error(fetchAudio.status, fetchAudio.statusText);
-  
-  const script = await fetchScript.json() as Script
   const audio = await fetchAudio.json() as Audio
-  return { script, audio }
+  return { audio }
 }
 
 
@@ -23,13 +18,14 @@ export const actions = {
     const src = file?.name || form.get('src') as string
     const start = form.get('start') as string
     const end = form.get('end') as string
-    
-    if (!type || !src || !start)
-      return fail(400)
-      
+    const percentageStart = form.get('percentageStart') as string
+    const percentageEnd = form.get('percentageEnd') as string
+
+    if (!type || !src || !start) return fail(400)
+
     // Upload audio file
     if (form.has('file')) {
-      const fetchAudio = await fetch(`/api/optiscapes/${params.title}/audio?category=${type}&file=${file.name}`, {
+      const fetchAudio = await fetch(`/api/optiscapes/${params.id}/audio?category=${type}&file=${file.name}`, {
         method: 'POST',
         body: await file.arrayBuffer()
       })
@@ -37,18 +33,22 @@ export const actions = {
     }
 
     // Update script
-    const body: ScriptPatchBody = {
-      type,
-      keyframeRange: { src, start, end },
+    const body: Partial<DBKeyframe> = {
+      category: type,
+      source: src,
+      start,
+      end,
+      start_percentage: parseFloat(percentageStart),
+      end_percentage: parseFloat(percentageEnd)
     }
-    
-    const updateScript = await fetch(`/api/optiscapes/${params.title}/script`, { 
+
+    const updateScript = await fetch(`/api/optiscapes/${params.id}/script`, { 
       body: JSON.stringify(body),
-      method: 'PATCH'
+      method: 'POST'
     })
-    
+
     if (updateScript.status !== 204) return fail(400)
-    
+
     return { success: true }
 	},
 } satisfies Actions;

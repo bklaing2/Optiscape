@@ -24,7 +24,7 @@ async function getInfo (book: ReturnType<typeof ePub>) {
 
   const bookInfo: Book = {
     id: meta.identifier,
-    title: meta.title,
+    id: meta.title,
     author: meta.creator,
     coverUrl: await book.coverUrl()
   }
@@ -54,7 +54,7 @@ export async function getAllBooks () {
 
     const bookInfo: Book = {
       id: meta.identifier,
-      title: meta.title,
+      id: meta.title,
       author: meta.creator,
       coverUrl: await book.coverUrl()
     }

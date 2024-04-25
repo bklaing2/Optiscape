@@ -1,8 +1,9 @@
 <script lang="ts">
   import { page } from '$app/stores';  
-  import type { Audio } from '$lib/types'
+  import type { Audio } from '$lib/types/types'
 	import type { Keyframe } from './Keyframe.svelte'
 	import Modal from '$lib/Modal.svelte'
+	import { getAudioLink } from '$lib/util/generateLink';
 
   export let show = false
   export let keyframe: Partial<Keyframe>
@@ -27,7 +28,7 @@
 
   async function handleMusicChange(event: any) {
     keyframe.src = event.target.value
-    audio.src = `/api/optiscapes/${$page.params.title}/audio/?category=${keyframe.type}&file=${keyframe.src}`
+    audio.src = getAudioLink($page.params.id, keyframe.type || '', keyframe.src || '')
   }
 
   function OnDiscard () {
@@ -92,6 +93,9 @@
       <span class="text-xs text-slate-700">{keyframe.cfiStart || ''}{keyframe.cfiEnd ? ' - ' : ''}{keyframe.cfiEnd || ''}</span>
       <input name="start" value={keyframe.cfiStart} type="hidden" />
       <input name="end" value={keyframe.cfiEnd} type="hidden" />
+
+      <input name="percentageStart" value={keyframe.percentageStart} type="hidden" />
+      <input name="percentageEnd" value={keyframe.percentageEnd} type="hidden" />
     </div>
 
 		<button slot="left button" class="text-rose-700" on:click={OnDiscard} type="button">Discard</button>
