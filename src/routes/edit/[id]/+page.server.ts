@@ -4,7 +4,7 @@ import type { Audio, DBKeyframe, Script } from '$lib/types/types';
 
 export const load: PageServerLoad = async ({ params, fetch }) => {
   const fetchAudio = await fetch(`/api/optiscapes/${params.id}/audio`)
-  if (fetchAudio.status !== 200) throw error(fetchAudio.status, fetchAudio.statusText);
+  if (fetchAudio.status !== 200) error(fetchAudio.status, fetchAudio.statusText);
   const audio = await fetchAudio.json() as Audio
   return { audio }
 }
@@ -29,7 +29,7 @@ export const actions = {
         method: 'POST',
         body: await file.arrayBuffer()
       })
-      if (fetchAudio.status !== 204) throw error(fetchAudio.status, fetchAudio.statusText);
+      if (fetchAudio.status !== 204) error(fetchAudio.status, fetchAudio.statusText);
     }
 
     // Update script
