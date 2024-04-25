@@ -1,5 +1,31 @@
 {
-  "music": [],
-  "ambience": [],
-  "sfx": []
+  "music": [
+    {
+      "src": "just-relax.mp3",
+      "start": "epubcfi(/6/6!/4/2[chapter-1]/4/1:226)",
+      "end": "epubcfi(/6/6!/4/2[chapter-1]/4/1:436)"
+    },
+    {
+      "src": "river-tram.mp3",
+      "start": "epubcfi(/6/6!/4/2[chapter-1]/4/1:0)",
+      "end": "epubcfi(/6/6!/4/2[chapter-1]/4/1:18)"
+    }
+  ],
+  "ambience": [
+    {
+      "src": "nature-sounds-water-forest.mp3",
+      "start": "epubcfi(/6/6!/4/2[chapter-1]/10/1:204)",
+      "end": "epubcfi(/6/6!/4/2[chapter-1]/28/1:276)"
+    }
+  ],
+  "sfx": [
+    {
+      "src": "punch.mp3",
+      "start": "epubcfi(/6/6!/4/2[chapter-1]/32/3:508)"
+    },
+    {
+      "src": "car-horn.mp3",
+      "start": "epubcfi(/6/6!/4/2[chapter-1]/6/1:1)"
+    }
+  ]
 }

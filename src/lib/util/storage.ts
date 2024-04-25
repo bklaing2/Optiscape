@@ -7,18 +7,30 @@ export function loadHistory (): Book[] {
 }
 
 
-export function updateHistory (book: Book) {
-  if (!book.percentage || book.percentage < 0.01) return
+export function updateHistory (title: Book['title'], location: Book['location'], percentage: Book['percentage']) {
+  if (!percentage || percentage < 0.01) return
 
   const history = loadHistory()
-  const index = history.findIndex(b => b.title === book.title)
+  const index = history.findIndex(b => b.title === title)
   
   if (index >= 0) history.splice(index, 1)
-  history.unshift(book)
+  history.unshift({ title, location, percentage })
   
   localStorage.setItem('history', JSON.stringify(history))
 }
 
+export function loadEditHistory (): Record<Book['title'], Book['location']> {
+  const editHistory = localStorage.getItem('editHistory')
+  return editHistory ? JSON.parse(editHistory) : {}
+}
+
+
+export function updateEditHistory (title: Book['title'], location: Book['location']) {
+  const editHistory = loadEditHistory()
+  editHistory[title] = location
+  
+  localStorage.setItem('editHistory', JSON.stringify(editHistory))
+}
 
 export function loadReadingRate (): RollingAverage {
   const cpm = localStorage.getItem('cpm')
@@ -36,6 +48,8 @@ export function updateReadingRate (readingRate: RollingAverage) {
 const storage = {
   updateHistory,
   loadHistory,
+  updateEditHistory,
+  loadEditHistory,
   loadReadingRate,
   updateReadingRate
 }

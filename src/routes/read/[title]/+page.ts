@@ -6,7 +6,7 @@ import type { Book } from '$lib/book/Book.svelte';
 
 export const ssr = false
 
-export const load: PageLoad = async ({ params, data, fetch }) => {
+export const load: PageLoad = async ({ params, url, data, fetch }) => {
   const fetchEpub = await fetch(`/api/optiscapes/${params.title}/epub`)
   if (fetchEpub.status !== 200) throw error(fetchEpub.status, fetchEpub.statusText);
 
@@ -24,12 +24,12 @@ export const load: PageLoad = async ({ params, data, fetch }) => {
 
   const history = storage.loadHistory()
   const saveData: Book = history.find(b => params.title === b.title) ?? { title: params.title }
-  
+  if (saveData.location) url.searchParams.set('location', saveData.location)
   const readingRate = storage.loadReadingRate()
 
   
   return {
-    saveData,
+    location: saveData.location,
     metadata,
     epub,
     script: data.script,

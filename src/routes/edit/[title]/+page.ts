@@ -1,3 +1,4 @@
+import storage from '$lib/util/storage';
 import type { PageLoad } from './$types';
 import { error } from '@sveltejs/kit';
 import ePub from 'epubjs'
@@ -19,10 +20,14 @@ export const load: PageLoad = async ({ params, data, fetch }) => {
     coverUrl: await epub.coverUrl()
   }
   
+  const history = storage.loadEditHistory()
+  const location = history[params.title]
   
   return {
     metadata,
     epub,
     script: data.script,
+    audio: data.audio,
+    location
   }
 }

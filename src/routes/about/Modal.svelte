@@ -12,32 +12,22 @@
 	bind:this={dialog}
 	on:close={() => (show = false)}
 	on:click|self={() => dialog.close()}
+	class="max-w-lg bg-orange-200/20 backdrop-blur rounded-3xl border-4 border-amber-900/60 backdrop:bg-slate-950/30"
 >
 
 	<!-- svelte-ignore a11y-no-static-element-interactions -->
-	<div on:click|stopPropagation>
+	<div on:click|stopPropagation class="p-4 grid grid-cols-2 gap-6">
 		<slot name="header" />
-		<hr />
+		<hr class="col-start-1 col-span-full" />
 		<slot />
-		<hr />
+		<hr class="col-start-1 col-span-full" />
 
-		<button on:click={() => dialog.close()}>Cancel</button>
+		<slot name="left button" />
+		<slot name="right button" />
 	</div>
 </dialog>
 
 <style>
-	dialog {
-		max-width: 32em;
-		border-radius: 0.2em;
-		border: none;
-		padding: 0;
-	}
-	dialog::backdrop {
-		background: rgba(0, 0, 0, 0.3);
-	}
-	dialog > div {
-		padding: 1em;
-	}
 	dialog[open] {
 		animation: zoom 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
 	}
@@ -59,8 +49,5 @@
 		to {
 			opacity: 1;
 		}
-	}
-	button {
-		display: block;
 	}
 </style>

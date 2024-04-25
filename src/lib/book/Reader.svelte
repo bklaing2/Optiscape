@@ -4,10 +4,11 @@
 
 <script lang="ts">
 	import { createEventDispatcher, onMount } from 'svelte'
-  import type { Book, Rendition } from 'epubjs'
+  import type { Book, Contents, Rendition } from 'epubjs'
 	import cfi from '$lib/util/cfi'
 	import ReaderNav from '$lib/buttons/ReaderNav.svelte';
 	import type { Relocated, Selected } from '$lib/types';
+	import sounds from '$lib/util/sounds';
 
 
   export let epub: Book
@@ -16,8 +17,9 @@
   let atStart = false, atEnd = false
 
   const dispatch = createEventDispatcher<{
-    pageTurned: CfiLocation,
-    selected: CfiLocation & { range: string }
+    clicked: undefined,
+    selected: CfiLocation & { range: string },
+    pageTurned: CfiLocation & { contents: Contents},
   }>()
 
 
@@ -27,10 +29,12 @@
       flow: "paginated",
       width: '100%',
       height: '100%',
-      stylesheet: "data:text/css;charset=utf-8,body{text-align:justify;}",
-      resizeOnOrientationChange: true
+      stylesheet: 'data:text/css;charset=utf-8,body{text-align:justify;}',
+      // script: `data:text/javascript;charset=utf-8,${script}`,
+      resizeOnOrientationChange: true,
+      allowScriptedContent: true
     })
-    
+
     rendition.display(location)
     
     rendition.on('relocated', displayNavButtons)
@@ -39,6 +43,18 @@
     rendition.on('keyup', keyboardNav)
   })
 
+  // const script = `
+  //   const customEvent = new CustomEvent('readerclicked');
+  //   document.addEventListener("click", handleClick);
+
+  //   function handleClick(event) {
+  //     window.parent.dispatchEvent(customEvent);
+  //   }
+  // `
+
+  function OuterFunction () {
+    console.log("OUTER Mouse clicked at:");
+  }
 
 
   function displayNavButtons (page: Relocated) {
@@ -47,7 +63,7 @@
   }
 
   function dispatchPageTurned (page: Relocated) {
-    dispatch('pageTurned', { start: page.start.cfi, end: page.end.cfi })
+    dispatch('pageTurned', { start: page.start.cfi, end: page.end.cfi, contents: rendition.getContents() })
   }
 
   function dispatchSelected (range: Selected) {
@@ -70,7 +86,7 @@
   }
 </script>
 
-<svelte:window on:keydown={keyboardNav} />
+<svelte:window on:keydown={keyboardNav}  on:click={OuterFunction} on:readerclicked={() => dispatch('clicked')} />
 
 
 <div class="book">
@@ -78,7 +94,7 @@
 
   <div class="flex drop-shadow-lg">
     <ReaderNav on:click={() => rendition.prev()} side="left" hidden={atStart} />
-    <button class="py-1 px-2 bg-orange-200/30 border border-amber-800/10 hover:bg-orange-300/20 select-none">{'⏵/⏸'}</button>
+    <button on:click={() => sounds.toggle()} class="py-1 px-2 bg-orange-200/30 border border-amber-800/10 hover:bg-orange-300/20 select-none">{'⏵/⏸'}</button>
     <ReaderNav on:click={() => rendition.next()} side="right" hidden={atEnd} />
   </div>
 </div>

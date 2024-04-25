@@ -3,9 +3,10 @@
 		id: number
 		type: 'music' | 'ambience' | 'sfx'
 		src: string
-		snippet: string
-		start: string
-		end: string
+		cfiStart: string
+		cfiEnd: string
+		snippetStart: string
+		snippetEnd: string
 	};
 </script>
 

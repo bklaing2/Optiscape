@@ -1,5 +1,86 @@
 {
-  "music": [],
-  "ambience": [],
-  "sfx": []
+  "music": [
+    {
+      "src": "secret-friend.mp3",
+      "start": "epubcfi(/6/10!/4/2[the-adventure-of-the-illustrious-client]/4/1:0)",
+      "end": "epubcfi(/6/10!/4/2[the-adventure-of-the-illustrious-client]/12/2/7:123)"
+    }
+  ],
+  "ambience": [
+    {
+      "src": "nature-sounds-water-forest.mp3",
+      "start": "epubcfi(/6/10!/4/2[the-adventure-of-the-illustrious-client]/4/1:0)",
+      "end": "epubcfi(/6/10!/4/2[the-adventure-of-the-illustrious-client]/24/1:22)"
+    }
+  ],
+  "sfx": [
+    {
+      "src": "dorm-door.mp3",
+      "start": "epubcfi(/6/10!/4/2[the-adventure-of-the-illustrious-client]/6/1:41)"
+    },
+    {
+      "src": "car-horn.mp3",
+      "start": "epubcfi(/6/10!/4/2[the-adventure-of-the-illustrious-client]/4/3:102)"
+    },
+    {
+      "src": null,
+      "start": "epubcfi(/6/10!/4/2[the-adventure-of-the-illustrious-client]/4/3:101)"
+    },
+    {
+      "src": null,
+      "start": "epubcfi(/6/10!/4/2[the-adventure-of-the-illustrious-client]/4/3:98)"
+    },
+    {
+      "src": null,
+      "start": "epubcfi(/6/10!/4/2[the-adventure-of-the-illustrious-client]/6/1:23)"
+    },
+    {
+      "src": null,
+      "start": "epubcfi(/6/10!/4/2[the-adventure-of-the-illustrious-client]/6/1:23)"
+    },
+    {
+      "src": null,
+      "start": "epubcfi(/6/10!/4/2[the-adventure-of-the-illustrious-client]/4/2/1:0)"
+    },
+    {
+      "src": null,
+      "start": "epubcfi(/6/10!/4/2[the-adventure-of-the-illustrious-client]/4/3:205)"
+    },
+    {
+      "src": null,
+      "start": "epubcfi(/6/10!/4/2[the-adventure-of-the-illustrious-client]/4/3:92)"
+    },
+    {
+      "src": null,
+      "start": "epubcfi(/6/10!/4/2[the-adventure-of-the-illustrious-client]/6/1:14)"
+    },
+    {
+      "src": null,
+      "start": "epubcfi(/6/10!/4/2[the-adventure-of-the-illustrious-client]/4/3:90)"
+    },
+    {
+      "src": null,
+      "start": "epubcfi(/6/10!/4/2[the-adventure-of-the-illustrious-client]/6/1:22)"
+    },
+    {
+      "src": null,
+      "start": "epubcfi(/6/10!/4/2[the-adventure-of-the-illustrious-client]/4/3:94)"
+    },
+    {
+      "src": "Corn is wierd.mp3",
+      "start": "epubcfi(/6/10!/4/2[the-adventure-of-the-illustrious-client]/4/3:87)"
+    },
+    {
+      "src": "Corn is wierd.mp3",
+      "start": "epubcfi(/6/10!/4/2[the-adventure-of-the-illustrious-client]/6/1:223)"
+    },
+    {
+      "src": "Corn is wierd.mp3",
+      "start": "epubcfi(/6/10!/4/2[the-adventure-of-the-illustrious-client]/4/3:200)"
+    },
+    {
+      "src": "Corn is wierd.mp3",
+      "start": "epubcfi(/6/10!/4/2[the-adventure-of-the-illustrious-client]/6/1:219)"
+    }
+  ]
 }
