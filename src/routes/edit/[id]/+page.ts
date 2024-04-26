@@ -5,7 +5,7 @@ import ePub from 'epubjs'
 
 export const ssr = false
 
-export const load: PageLoad = async ({ params, url, data }) => {
+export const load: PageLoad = async ({ params, url }) => {
   const epub = ePub(getEpubLink(params.id))
 
   await epub.ready
@@ -24,7 +24,6 @@ export const load: PageLoad = async ({ params, url, data }) => {
   return {
     metadata,
     epub,
-    audio: data.audio,
     location
   }
 }

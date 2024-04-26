@@ -52,10 +52,6 @@
   //   }
   // `
 
-  function OuterFunction () {
-    console.log("OUTER Mouse clicked at:");
-  }
-
 
   function displayNavButtons (page: Relocated) {
     atStart = !!page.atStart
@@ -86,7 +82,7 @@
   }
 </script>
 
-<svelte:window on:keydown={keyboardNav}  on:click={OuterFunction} on:readerclicked={() => dispatch('clicked')} />
+<svelte:window on:keydown={keyboardNav} on:readerclicked={() => dispatch('clicked')} />
 
 
 <div class="book">

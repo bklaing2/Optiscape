@@ -11,9 +11,9 @@
     chapter: NavItem,
   }>()
   
-  $: music = keyframes.filter(kf => kf.type === 'music')
-  $: ambience = keyframes.filter(kf => kf.type === 'ambience')
-  $: sfx = keyframes.filter(kf => kf.type === 'sfx')
+  $: music = keyframes.filter(kf => kf.category === 'music')
+  $: ambience = keyframes.filter(kf => kf.category === 'ambience')
+  $: sfx = keyframes.filter(kf => kf.category === 'sfx')
 
   $: book.loaded.navigation.then(async n => {
     console.log(n)

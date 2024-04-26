@@ -1,19 +1,18 @@
 import type { Contents } from "epubjs";
-import type { AUDIO_CATEGORIES } from "../constants";
 
-export type AudioCategory = typeof AUDIO_CATEGORIES[number]
-
-export type Keyframe = { src: string; start: string }
-export type KeyframeRange = Keyframe & { end: string }
-
-export type Script = {
-  sfx: Keyframe[]
-  ambience: KeyframeRange[]
-  music: KeyframeRange[]
+export interface Keyframe {
+  id: number;
+  book_id: string;
+  category: "sfx" | "ambience" | "music";
+  source: string;
+  start: string;
+  end: string | null;
+  end_percentage: number;
+  start_percentage: number;
 }
 
-export type Audio = Record<AudioCategory, string[]>
 
+// epubjs types
 type Location = {
   cfi: string
   href: string // href of the containing section
@@ -37,35 +36,8 @@ export type Selection = {
   end: string
 }
 
-export type CPM = {
-  data: number[]
-  windowSize: number
-  outlierCount: number
-}
-
-
 export interface PageTurned {
   start: string
   end: string
   contents: Contents
-}
-
-
-
-export type ScriptPatchBody = {
-  type: AudioCategory
-  keyframeRange: DBKeyframe
-}
-
-
-
-export interface DBKeyframe {
-  book_id: string;
-  category: "sfx" | "ambience" | "music";
-  end: string | null;
-  end_percentage: number;
-  id: number;
-  source: string;
-  start: string;
-  start_percentage: number;
 }

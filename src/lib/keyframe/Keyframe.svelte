@@ -1,14 +1,14 @@
 <script lang="ts" context="module">
 	export type Keyframe = {
 		id: number
-		type: 'music' | 'ambience' | 'sfx'
-		src: string
-		cfiStart: string
-		cfiEnd: string
+		category: 'music' | 'ambience' | 'sfx'
+		source: string
+		start: string
+		end: string
 		snippetStart: string
 		snippetEnd: string
-		percentageStart: number
-		percentageEnd: number
+		start_percentage: number
+		end_percentage: number
 	};
 </script>
 

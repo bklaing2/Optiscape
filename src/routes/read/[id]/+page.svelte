@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { page } from '$app/stores';
 	import type { PageData } from './$types';
-	import type { AudioCategory, DBKeyframe, Keyframe, KeyframeRange, PageTurned } from '$lib/types/types'
+	import type { Keyframe, PageTurned } from '$lib/types/types'
 	import sounds from '$lib/util/sounds';
 	import cfi from '$lib/util/cfi'
 	import { updateHistory, updateReadingRate } from '$lib/util/storage.js'
@@ -15,7 +15,7 @@
 	let startTime = Number.NEGATIVE_INFINITY
 	let pendingKeyframes = {
 		start: [] as NodeJS.Timeout[],
-		end: [] as { timeout: NodeJS.Timeout; kf: DBKeyframe }[]
+		end: [] as { timeout: NodeJS.Timeout; kf: Keyframe }[]
 	}
   
   
@@ -52,7 +52,7 @@
 		const startPercentage = epub.locations.percentageFromCfi(start)
 		const endPercentage = epub.locations.percentageFromCfi(end)
 		const response = await fetch(`/api/optiscapes/${$page.params.id}/script?start=${startPercentage}&end=${endPercentage}`)
-		const script = await response.json() as DBKeyframe[]
+		const script = await response.json() as Keyframe[]
 
 		for (const kf of script) {
 			startKeyframe(kf, start, end)	
@@ -62,14 +62,15 @@
 
 	
 
-	async function startKeyframe (kf: DBKeyframe, start: string, end: string) {
+	async function startKeyframe (kf: Keyframe, start: string, end: string) {
+		console.log('START KEY FRAME', kf)
 		if (!cfi.inRange(kf.start, start, end)) return
 
 		const offset = await cfi.countChars(start, kf.start, epub)
 		const delay = offset / readingRate.Average * 60000
 
 		const t = setTimeout (() => {
-
+		console.log('KEY FRAME STARTED', kf)
 			switch (kf.category) {
 				case 'music':
 					sounds.changeMusic(kf.source)
@@ -89,7 +90,8 @@
 	}
 
 
-	async function endKeyframe (kf: DBKeyframe, start: string, end: string) {
+	async function endKeyframe (kf: Keyframe, start: string, end: string) {
+		console.log('END KEY FRAME', kf)
 		if (!kf.end || cfi.inRange(kf.end, start, end)) return
 
 		const offset = await cfi.countChars(start, kf.end, epub)
@@ -99,7 +101,8 @@
 		pendingKeyframes.end.push({ timeout: t, kf })
 	}
 
-	function onEndKeyFrame (kf: DBKeyframe) {
+	function onEndKeyFrame (kf: Keyframe) {
+		console.log('KEY FRAME ENDED', kf)
 		switch (kf.category) {
 			case 'music':
 				sounds.endMusic(kf.source)
