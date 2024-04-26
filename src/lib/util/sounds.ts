@@ -43,7 +43,7 @@ function changeMusic (src: string) {
 }
 
 function endMusic (src: string) {
-  if (music.src.includes(src)) return
+  if (music.src !== src) return
 
   music.pause()
   music.removeAttribute('src')
