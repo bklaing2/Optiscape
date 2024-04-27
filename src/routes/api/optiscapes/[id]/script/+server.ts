@@ -17,7 +17,6 @@ export const GET: RequestHandler = async ({ params, url, locals }) => {
     .order('start_percentage', { ascending: true })
     .order('end_percentage', { ascending: true })
    
-  console.log(response, start, end)
   if (response.error) error(500, response.error.message)
   return json(response.data)
 }

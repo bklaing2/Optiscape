@@ -40,7 +40,7 @@
 
   onMount(() => {
     rendition = epub.renderTo('rendition', {
-      manager: "continuous",
+      // manager: "continuous",
       flow: "paginated",
       width: '100%',
       height: '100%',
@@ -50,7 +50,12 @@
     })
 
     rendition.themes.default({
-      body: { 'text-align': 'justify' },
+      body: {
+        width: '100svw',
+        'max-width': '100svw',
+        'box-sizing': 'border-box',
+        'text-align': 'justify'
+      },
     })
 
     rendition.display(location)
@@ -119,11 +124,12 @@
   on:readermousemove={e => dispatch('mousemove', { x: e.detail.x, y: e.detail.y})}
   on:readermousedown={e => dispatch('mousedown', { x: e.detail.x, y: e.detail.y})}
   on:readermouseup={e => dispatch('mouseup', { x: e.detail.x, y: e.detail.y})}
+  on:resize={undefined}
 />
 
 
-<div class="book">
-  <div id="rendition" class="max-w-[45rem] max-h-[30rem] h-svh renderer mx-auto"></div>
+<div class="max-w-full h-full">
+  <div id="rendition" class="max-width-full h-96"></div>
 
   <div class="flex drop-shadow-lg">
     <ReaderNav on:click={() => rendition.prev()} side="left" hidden={atStart} />

@@ -1,9 +1,12 @@
 <script>
+	import { page } from '$app/stores';
 	import NavLink from '$lib/buttons/NavLink.svelte';
+
+	$: reading = $page.url.pathname.includes('/read/')
 </script>
 
-<header class="grid grid-cols-[min-content_1fr_min-content] justify-items-center items-baseline my-6 mx-8">
-	<div class="flex gap-2 items-baseline">
+<header class="flex justify-start items-baseline gap-8 my-6 mx-auto">
+	<div class="flex gap-2 items-baseline mr-4">
 		<!-- <img src="favicon.jpg" alt="optiscape icon" class="h-8 aspect-square"/> -->
 		<a href="/" class="text-xl text-amber-900">Optiscape</a>
 	</div>
@@ -12,8 +15,7 @@
 		<ul class="flex gap-4">
 			<NavLink href="/">Home</NavLink>
 			<NavLink href="/books">Books</NavLink>
-			<!-- <NavLink href="/about">About</NavLink> -->
-			<!-- <NavLink href="/sverdle">Contribute</NavLink> -->
+			<NavLink href="/edit/{$page.params.id}" hidden={!reading}>Edit this book!</NavLink>
 		</ul>
 	</nav>
 </header>

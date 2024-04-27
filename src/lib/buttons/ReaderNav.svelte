@@ -17,6 +17,7 @@
     ${side === 'left' ? 'rounded-l-full' : 'rounded-r-full'}
     ${hidden && 'invisible'}
     select-none
+    touch-manipulation
   `}
   on:click
 >
