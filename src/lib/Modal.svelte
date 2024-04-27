@@ -16,7 +16,7 @@
 >
 
 	<!-- svelte-ignore a11y-no-static-element-interactions -->
-	<div on:click|stopPropagation class="h-full p-4 grid grid-cols-2 gap-6">
+	<div on:click|stopPropagation class="h-full p-4 grid grid-rows-[repeat(2,_min-content)_minmax(min-content,_1fr)_repeat(2,_min-content)] grid-cols-2 gap-6">
 		<slot name="header" />
 		<hr class="col-start-1 col-span-full" />
 		<slot />

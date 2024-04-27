@@ -8,7 +8,7 @@
 <div class="grid grid-rows-[min-content_minmax(min-content,_1fr)_min-content] gap-8 pb-16 h-full max-w-4xl mx-auto">
 	<Header />
 
-	<main class="relative flex flex-col p-4"><slot /></main>
+	<main class="flex flex-col p-4"><slot /></main>
 
 	<Footer signedIn={false} />
 </div>

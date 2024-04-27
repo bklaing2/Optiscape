@@ -10,20 +10,21 @@ export const actions = {
     const source = form.get('source') as string
     const start = form.get('start') as string
     const end = form.get('end') as string
-    const percentageStart = form.get('percentageStart') as string
-    const percentageEnd = form.get('percentageEnd') as string
+    const percentageStart = parseFloat(form.get('percentageStart') as string)
+    const percentageEnd = parseFloat(form.get('percentageEnd') as string)
 
     if (!category || !source || !start || !percentageStart) return fail(400)
 
+    const flipped = percentageStart > percentageEnd
 
     // Update script
     const body: Partial<Keyframe> = {
       category,
       source,
-      start,
-      end,
-      start_percentage: parseFloat(percentageStart),
-      end_percentage: parseFloat(percentageEnd)
+      start: flipped ? end : start,
+      end: flipped ? start : end,
+      start_percentage: flipped ? percentageEnd : percentageStart,
+      end_percentage: flipped ? percentageStart : percentageEnd
     }
 
     const updateScript = await fetch(`/api/optiscapes/${params.id}/script`, { 

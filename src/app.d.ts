@@ -16,4 +16,10 @@ declare global {
 	}
 }
 
+declare namespace svelteHTML {
+  interface HTMLAttributes<T> {
+    'on:readerMouseDown'?: (event: any) => any;
+  }
+}
+
 export {};

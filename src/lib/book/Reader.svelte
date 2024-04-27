@@ -13,13 +13,28 @@
 
   export let epub: Book
   export let location: string | undefined = undefined
+
+  export function Highlight (range: Selected, color?: string) {
+    const id = new Date().toString()
+    rendition.annotations.highlight(range, { id: id }, (e: any) => {
+      console.log(e.target)
+    }, undefined, color ? { 'fill': color } : {})
+    console.log (rendition.getContents)
+  }
+
+  export function RemoveHighlight (range: Selected) {
+    rendition.annotations.remove(range, 'highlight')
+  }
+
   let rendition: Rendition
   let atStart = false, atEnd = false
 
   const dispatch = createEventDispatcher<{
-    clicked: undefined,
     selected: CfiLocation & { range: string },
     pageTurned: CfiLocation & { contents: Contents},
+    mousemove: { x: number, y: number },
+    mousedown: { x: number, y: number },
+    mouseup: { x: number, y: number },
   }>()
 
 
@@ -29,10 +44,13 @@
       flow: "paginated",
       width: '100%',
       height: '100%',
-      stylesheet: 'data:text/css;charset=utf-8,body{text-align:justify;}',
-      // script: `data:text/javascript;charset=utf-8,${script}`,
+      script: `data:text/javascript;charset=utf-8,${script}`,
       resizeOnOrientationChange: true,
       allowScriptedContent: true
+    })
+
+    rendition.themes.default({
+      body: { 'text-align': 'justify' },
     })
 
     rendition.display(location)
@@ -41,16 +59,30 @@
     rendition.on('relocated', dispatchPageTurned)
     rendition.on('selected', dispatchSelected)
     rendition.on('keyup', keyboardNav)
+
+    // rendition.on('markClicked', e => console.log(e))
   })
 
-  // const script = `
-  //   const customEvent = new CustomEvent('readerclicked');
-  //   document.addEventListener("click", handleClick);
+  const script = `
+    document.addEventListener("mousemove", onMouseMove);
+    document.addEventListener("mousedown", onMouseDown);
+    document.addEventListener("mouseup", onMouseUp);
 
-  //   function handleClick(event) {
-  //     window.parent.dispatchEvent(customEvent);
-  //   }
-  // `
+    function onMouseMove(e) {
+      const mouseMoveEvent = new CustomEvent('readermousemove', { detail: { x: e.screenX, y: e.screenY } });
+      window.parent.dispatchEvent(mouseMoveEvent);
+    }
+
+    function onMouseDown(e) {
+      const mouseDownEvent = new CustomEvent('readermousedown', { detail: { x: e.screenX, y: e.screenY } });
+      window.parent.dispatchEvent(mouseDownEvent);
+    }
+
+    function onMouseUp(e) {
+      const mouseUpEvent = new CustomEvent('readermouseup', { detail: { x: e.screenX, y: e.screenY } });
+      window.parent.dispatchEvent(mouseUpEvent);
+    }
+  `
 
 
   function displayNavButtons (page: Relocated) {
@@ -82,7 +114,12 @@
   }
 </script>
 
-<svelte:window on:keydown={keyboardNav} on:readerclicked={() => dispatch('clicked')} />
+<svelte:window
+  on:keydown={keyboardNav}
+  on:readermousemove={e => dispatch('mousemove', { x: e.detail.x, y: e.detail.y})}
+  on:readermousedown={e => dispatch('mousedown', { x: e.detail.x, y: e.detail.y})}
+  on:readermouseup={e => dispatch('mouseup', { x: e.detail.x, y: e.detail.y})}
+/>
 
 
 <div class="book">

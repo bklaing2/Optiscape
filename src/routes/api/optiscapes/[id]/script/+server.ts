@@ -30,6 +30,7 @@ export const POST: RequestHandler = async ({ locals, params, request }) => {
   
   if (kf.category !== 'sfx' && kf.category !== 'ambience' && kf.category !== 'music') error(400, 'Invalid type')
   if (!kf.start || (kf.category !== 'sfx' && !kf.end)) error(400, 'Invalid keyframe')
+  if (kf.end_percentage < kf.start_percentage) error(400, 'End must be greater than start')
 
   const response = await supabase
     .from('keyframes')
