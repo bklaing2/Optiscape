@@ -60,7 +60,8 @@
 
 	async function startKeyframe(kf: Keyframe, start: string, end: string) {
 		console.log('START KEY FRAME', kf.category);
-		if (!cfi.inRange(kf.start, start, end)) return;
+		const [kfStart] = cfi.split(kf.start);
+		if (!cfi.inRange(kfStart, start, end)) return;
 
 		const offset = await cfi.countChars(start, kf.start, epub);
 		const delay = (offset / readingRate.Average) * 60000;
@@ -87,7 +88,9 @@
 
 	async function endKeyframe(kf: Keyframe, start: string, end: string) {
 		console.log('END KEY FRAME', kf.category);
-		if (!kf.end || !cfi.inRange(kf.end, start, end)) return;
+		if (!kf.end) return;
+		const [, kfEnd] = cfi.split(kf.end);
+		if (!cfi.inRange(kfEnd, start, end)) return;
 
 		const offset = await cfi.countChars(start, kf.end, epub);
 		const delay = (offset / readingRate.Average) * 60000;
@@ -128,4 +131,3 @@
 <svelte:window on:beforeunload={epub.destroy} />
 
 <Reader {epub} {location} on:pageTurned={(e) => onPageTurn(e.detail)} />
-

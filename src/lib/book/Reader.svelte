@@ -1,74 +1,92 @@
 <script lang="ts" context="module">
-  export type CfiLocation = { start: string, end: string };
+	export type CfiLocation = { start: string; end: string };
 </script>
 
 <script lang="ts">
-	import { createEventDispatcher, onMount } from 'svelte'
-  import type { Book, Contents, Rendition } from 'epubjs'
-	import cfi from '$lib/util/cfi'
+	import { createEventDispatcher, onMount } from 'svelte';
+	import type { Book, Contents, NavItem, Rendition } from 'epubjs';
+	import cfi from '$lib/util/cfi';
 	import ReaderNav from '$lib/buttons/ReaderNav.svelte';
 	import type { Relocated, Selected } from '$lib/types/types';
 	import sounds from '$lib/util/sounds';
 
+	export let epub: Book;
+	export let location: string | undefined = undefined;
+	export let showPlayButton = false;
 
-  export let epub: Book
-  export let location: string | undefined = undefined
+	let rendition: Rendition;
+	let atStart = false,
+		atEnd = false;
 
-  export function Highlight (range: Selected, color?: string) {
-    const id = new Date().toString()
-    rendition.annotations.highlight(range, { id: id }, (e: any) => {
-      console.log(e.target)
-    }, undefined, color ? { 'fill': color } : {})
-    console.log (rendition.getContents)
-  }
+	let highlights = [] as Selected[];
 
-  export function RemoveHighlight (range: Selected) {
-    rendition.annotations.remove(range, 'highlight')
-  }
+	export function Display(location: string) {
+		rendition.display(location);
+	}
 
-  let rendition: Rendition
-  let atStart = false, atEnd = false
+	export function Highlight(range: Selected, color?: string) {
+		const id = new Date().toString();
+		rendition.annotations.highlight(
+			range,
+			{ id: id },
+			(e: any) => {
+				console.log(e.target);
+			},
+			undefined,
+			color ? { fill: color } : {}
+		);
 
-  const dispatch = createEventDispatcher<{
-    selected: CfiLocation & { range: string },
-    pageTurned: CfiLocation & { contents: Contents},
-    mousemove: { x: number, y: number },
-    mousedown: { x: number, y: number },
-    mouseup: { x: number, y: number },
-  }>()
+		highlights.push(range);
+	}
 
+	export function RemoveHighlight(range: Selected) {
+		rendition.annotations.remove(range, 'highlight');
+	}
 
-  onMount(() => {
-    rendition = epub.renderTo('rendition', {
-      // manager: "continuous",
-      flow: "paginated",
-      width: '100%',
-      height: '100%',
-      script: `data:text/javascript;charset=utf-8,${script}`,
-      resizeOnOrientationChange: true,
-      allowScriptedContent: true
-    })
+	export function ClearHighlights() {
+		for (const h of highlights) RemoveHighlight(h);
+		highlights = [];
+	}
 
-    rendition.themes.default({
-      body: {
-        width: '100svw',
-        'max-width': '100svw',
-        'box-sizing': 'border-box',
-        'text-align': 'justify'
-      },
-    })
+	const dispatch = createEventDispatcher<{
+		selected: CfiLocation & { range: string };
+		pageTurned: CfiLocation & { contents: Contents };
+		mousemove: { x: number; y: number };
+		mousedown: { x: number; y: number };
+		mouseup: { x: number; y: number };
+	}>();
 
-    rendition.display(location)
-    
-    rendition.on('relocated', displayNavButtons)
-    rendition.on('relocated', dispatchPageTurned)
-    rendition.on('selected', dispatchSelected)
-    rendition.on('keyup', keyboardNav)
+	onMount(() => {
+		rendition = epub.renderTo('rendition', {
+			// manager: "continuous",
+			flow: 'paginated',
+			width: '100%',
+			height: '100%',
+			script: `data:text/javascript;charset=utf-8,${script}`,
+			resizeOnOrientationChange: true,
+			allowScriptedContent: true
+		});
 
-    // rendition.on('markClicked', e => console.log(e))
-  })
+		rendition.themes.default({
+			body: {
+				width: '100svw',
+				'max-width': '100svw',
+				'box-sizing': 'border-box',
+				'text-align': 'justify'
+			}
+		});
 
-  const script = `
+		rendition.display(location);
+
+		rendition.on('relocated', displayNavButtons);
+		rendition.on('relocated', dispatchPageTurned);
+		rendition.on('selected', dispatchSelected);
+		rendition.on('keyup', keyboardNav);
+
+		// rendition.on('markClicked', e => console.log(e))
+	});
+
+	const script = `
     document.addEventListener("mousemove", onMouseMove);
     document.addEventListener("mousedown", onMouseDown);
     document.addEventListener("mouseup", onMouseUp);
@@ -87,53 +105,59 @@
       const mouseUpEvent = new CustomEvent('readermouseup', { detail: { x: e.screenX, y: e.screenY } });
       window.parent.dispatchEvent(mouseUpEvent);
     }
-  `
+  `;
 
+	function displayNavButtons(page: Relocated) {
+		atStart = !!page.atStart;
+		atEnd = !!page.atEnd;
+	}
 
-  function displayNavButtons (page: Relocated) {
-    atStart = !!page.atStart
-    atEnd = !!page.atEnd
-  }
+	function dispatchPageTurned(page: Relocated) {
+		dispatch('pageTurned', {
+			start: page.start.cfi,
+			end: page.end.cfi,
+			contents: rendition.getContents()
+		});
+	}
 
-  function dispatchPageTurned (page: Relocated) {
-    dispatch('pageTurned', { start: page.start.cfi, end: page.end.cfi, contents: rendition.getContents() })
-  }
+	function dispatchSelected(range: Selected) {
+		const [start, end] = cfi.split(range);
+		dispatch('selected', { range, start, end });
+	}
 
-  function dispatchSelected (range: Selected) {
-    const [ start, end ] = cfi.split(range)
-    dispatch('selected', { range, start, end })
-  }
+	function keyboardNav(e: KeyboardEvent) {
+		switch (e.key) {
+			case 'ArrowLeft':
+			case 'ArrowUp':
+				rendition.prev();
+				break;
 
-  function keyboardNav(e: KeyboardEvent) {
-    switch(e.key) {
-      case 'ArrowLeft':
-      case 'ArrowUp':
-        rendition.prev()
-        break
-
-      case 'ArrowRight':
-      case 'ArrowDown':
-        rendition.next()
-        break
-    }
-  }
+			case 'ArrowRight':
+			case 'ArrowDown':
+				rendition.next();
+				break;
+		}
+	}
 </script>
 
 <svelte:window
-  on:keydown={keyboardNav}
-  on:readermousemove={e => dispatch('mousemove', { x: e.detail.x, y: e.detail.y})}
-  on:readermousedown={e => dispatch('mousedown', { x: e.detail.x, y: e.detail.y})}
-  on:readermouseup={e => dispatch('mouseup', { x: e.detail.x, y: e.detail.y})}
-  on:resize={undefined}
+	on:keydown={keyboardNav}
+	on:readermousemove={(e) => dispatch('mousemove', { x: e.detail.x, y: e.detail.y })}
+	on:readermousedown={(e) => dispatch('mousedown', { x: e.detail.x, y: e.detail.y })}
+	on:readermouseup={(e) => dispatch('mouseup', { x: e.detail.x, y: e.detail.y })}
+	on:resize={undefined}
 />
 
-
 <div class="max-w-full h-full">
-  <div id="rendition" class="max-width-full h-96"></div>
+	<div id="rendition" class="max-width-full h-96" />
 
-  <div class="flex drop-shadow-lg">
-    <ReaderNav on:click={() => rendition.prev()} side="left" hidden={atStart} />
-    <button on:click={() => sounds.toggle()} class="py-1 px-2 bg-orange-200/30 border border-amber-800/10 hover:bg-orange-300/20 select-none">{'⏵/⏸'}</button>
-    <ReaderNav on:click={() => rendition.next()} side="right" hidden={atEnd} />
-  </div>
+	<div class="flex drop-shadow-lg">
+		<ReaderNav on:click={() => rendition.prev()} side="left" hidden={atStart} />
+		<button
+			on:click={() => sounds.toggle()}
+			class="py-1 px-2 bg-orange-200/30 border border-amber-800/10 hover:bg-orange-300/20 select-none"
+			style:display={showPlayButton ? undefined : 'none'}>{'⏵/⏸'}</button
+		>
+		<ReaderNav on:click={() => rendition.next()} side="right" hidden={atEnd} />
+	</div>
 </div>

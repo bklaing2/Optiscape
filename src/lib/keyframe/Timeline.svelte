@@ -1,39 +1,47 @@
 <script lang="ts">
-	import { createEventDispatcher } from 'svelte'
-	import type { Book, NavItem } from 'epubjs'
-	import cfi from '$lib/util/cfi'
-  import type { Keyframe } from './Keyframe.svelte'
+	import type { Book } from 'epubjs';
+	import type { Keyframe } from '$lib/types/types';
+	import TimelineSection from './TimelineSection.svelte';
+	import cfi from '$lib/util/cfi';
 
-  export let keyframes: Keyframe[]
-  export let book: Book
+	export let keyframes: (Keyframe & { start_snippet: string; end_snippet?: string })[];
+	export let book: Book;
 
-  const dispatch = createEventDispatcher<{
-    chapter: NavItem,
-  }>()
-  
-  $: music = keyframes.filter(kf => kf.category === 'music')
-  $: ambience = keyframes.filter(kf => kf.category === 'ambience')
-  $: sfx = keyframes.filter(kf => kf.category === 'sfx')
+	$: SectionKeyframes = async () => {
+		const percentages = await Promise.all(
+			book.navigation.toc.map(async (c) =>
+				book.locations.percentageFromCfi(await cfi.fromHref(c.href, book))
+			)
+		);
 
-  $: book.loaded.navigation.then(async n => {
-    console.log(n)
-    const cfis = await Promise.all(n.toc.map(async c => await cfi.fromHref(c.href, book)))
-    console.log(cfis)
-  })
+		return keyframes.reduce(
+			(kfs, kf) => {
+				for (const [i, percentage] of percentages.entries()) {
+					if (percentage < kf.start_percentage) continue;
+
+					kfs[i - 1].push(kf);
+					break;
+				}
+
+				return kfs;
+			},
+			percentages.map((_) => [] as typeof keyframes)
+		);
+	};
 </script>
 
-{#await book.loaded.navigation}
-  <p>Loading Timeline...</p>
-{:then navigation} 
-  <table>
-    <th>
-      {#each navigation.toc as chapter (chapter.id) }
-        <td>
-          <button on:click={() => dispatch('chapter', chapter)}>{chapter.label}</button>
-        </td>
-      {/each}
-    </th>
-  </table>
+{#await SectionKeyframes() then sectionedKeyframes}
+	<div
+		class="grid grid-cols-[min-content_min-content_1fr_1fr_min-content] gap-4 justify-items-start"
+	>
+		{#each book.navigation.toc as chapter, i (chapter.id)}
+			<TimelineSection
+				{chapter}
+				keyframes={sectionedKeyframes[i]}
+				on:chapterClicked
+				on:keyframeClicked
+				on:keyframeDeleted
+			/>
+		{/each}
+	</div>
 {/await}
-
-
