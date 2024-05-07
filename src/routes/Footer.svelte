@@ -16,7 +16,7 @@
 			>
 		</li>
 		<li>
-			<a href="https://buymeacoffee.com/autofy" class="flex gap-1 hover:text-amber-900"
+			<a href="https://buymeacoffee.com/blaing" class="flex gap-1 hover:text-amber-900"
 				><span>☕️</span>Support the site!</a
 			>
 		</li>
