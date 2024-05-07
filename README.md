@@ -1,38 +1,9 @@
-# create-svelte
+# [Optiscape](https://www.optiscape.me/) - Enhance your reading experience
 
-Everything you need to build a Svelte project, powered by [`create-svelte`](https://github.com/sveltejs/kit/tree/master/packages/create-svelte).
+Optiscape brings every word to life with immersive audio that amplifies your imagination. It enhances the ebook experience by adding sound effects, ambience, and music. Music and ambience will automatically change depending on the setting of the book, and sound effects will play as you read.
 
-## Creating a project
+Anyone may contribute by adding audio to a book using the built-in editor. Simply select the start of the section of text where you would like to add sound and an option will appear to choose SFX, ambience, or music. If you are adding ambience or music, you then select where the audio should stop. You may then search for and submit the sound.
 
-If you're seeing this, you've probably already done this step. Congrats!
+Please be mindful that sounds are added for everyone who visits the site, like a wiki. Similarly, if you delete an existing sound from the book it is deleted for everyone.
 
-```bash
-# create a new project in the current directory
-npm create svelte@latest
-
-# create a new project in my-app
-npm create svelte@latest my-app
-```
-
-## Developing
-
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
-
-```bash
-npm run dev
-
-# or start the server and open the app in a new browser tab
-npm run dev -- --open
-```
-
-## Building
-
-To create a production version of your app:
-
-```bash
-npm run build
-```
-
-You can preview the production build with `npm run preview`.
-
-> To deploy your app, you may need to install an [adapter](https://kit.svelte.dev/docs/adapters) for your target environment.
+[Check out the site to get started!](https://www.optiscape.me/)
