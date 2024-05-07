@@ -1,5 +1,12 @@
 import type { Contents } from "epubjs";
 
+export interface Book {
+  id: string
+  location?: string
+  percentage?: number
+};
+
+
 export interface Keyframe {
   id: number;
   book_id: string;

@@ -1,4 +1,4 @@
-import type { Book } from '$lib/book/Book.svelte'
+import type { Book } from '$lib/types/types';
 import RollingAverage, { type IRollingAverage } from './rollingAverage'
 
 export function loadHistory(): Book[] {

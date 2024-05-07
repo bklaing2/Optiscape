@@ -3,11 +3,11 @@
 	export let signedIn: boolean;
 </script>
 
-<footer class="flex justify-center items-center gap-8 p-8">
+<footer class="flex flex-col justify-center items-center gap-x-8 gap-y-4 p-8">
 	<ul class="flex gap-8">
 		<li>
 			<a href="/" class="flex gap-1 hover:text-amber-900"
-				><img src="%sveltekit.assets%/favicon.jpg" alt="optiscape icon" class="w-5" />Optiscape</a
+				><img src="favicon.jpg" alt="optiscape icon" class="w-5" />Optiscape</a
 			>
 		</li>
 		<li>
@@ -17,7 +17,7 @@
 		</li>
 		<li>
 			<a href="https://buymeacoffee.com/autofy" class="flex gap-1 hover:text-amber-900"
-				><span>🍕</span>Support the site!</a
+				><span>☕️</span>Support the site!</a
 			>
 		</li>
 
@@ -26,6 +26,21 @@
 				<button class="sign-out" type="submit">sign out</button>
 			</li>
 			<li />{/if}
+	</ul>
+
+	<ul class="contents">
+		<li>
+			<p class="text-slate-400">
+				Books provided by <a href="https://standardebooks.org/" class="underline inline"
+					>Standard Ebooks</a
+				>
+			</p>
+		</li>
+		<li>
+			<p class="text-slate-400">
+				Sounds provided by <a href="https://freesound.org/" class="underline inline">Freesound</a>
+			</p>
+		</li>
 	</ul>
 </footer>
 

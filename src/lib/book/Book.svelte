@@ -1,129 +1,107 @@
 <script lang="ts" context="module">
-	export type Book = {
-    id: string
-    location?: string
-		percentage?: number
+	type BookMetadata = {
+		id: string;
+		title: string;
+		author: string;
+		coverUrl?: string | null;
 	};
-  
-  export type BookMetadata = {
-    id: string
-    title: string
-    author: string
-    coverUrl?: string | null
-  }
-
 </script>
 
 <script lang="ts">
-	import { onMount } from "svelte";
-	import ePub from "epubjs";
-	import { getEpubLink } from "$lib/util/generateLink";
+	import { onMount } from 'svelte';
+	import ePub from 'epubjs';
+	import type { Book } from '$lib/types/types';
+	import { getEpubLink } from '$lib/util/generateLink';
 
+	export let book: Book = { id: '' };
+	export let edit = false;
+	export let height = 200;
+	export let className = '';
 
-  export let book: Book = { id: '' }
-  export let height = 200
-  export let className = ''
-  
-  let metadata: BookMetadata = { id: '', title: '', author: '', coverUrl: null }
+	let metadata: BookMetadata = { id: '', title: '', author: '', coverUrl: null };
 
-  $: percentage = book.percentage ? book.percentage : -1
-  $: href = `/read/${book.id}`
+	$: percentage = book.percentage ? book.percentage : -1;
+	$: href = `/${edit ? 'edit' : 'read'}/${book.id}`;
 
+	onMount(async () => {
+		const epub = ePub(getEpubLink(book.id));
+		await epub.ready;
 
-  onMount (async () => {
-    const epub = ePub(getEpubLink(book.id))
-    await epub.ready
+		const meta = epub.packaging.metadata;
 
-    const meta = epub.packaging.metadata
-
-    metadata = {
-      id: meta.identifier,
-      title: meta.title,
-      author: meta.creator,
-      coverUrl: await epub.coverUrl()
-    }
-  })
+		metadata = {
+			id: meta.identifier,
+			title: meta.title,
+			author: meta.creator,
+			coverUrl: await epub.coverUrl()
+		};
+	});
 </script>
 
-
 <div class={`relative ${className}`}>
-  <a
-    {href}
-    class="book"
-    style:background-image={`url(${metadata.coverUrl})`}
-    style:height={`${height}px`}>
+	<a
+		{href}
+		class="book"
+		style:background-image={`url(${metadata.coverUrl})`}
+		style:height={`${height}px`}
+	>
+		<div class="details">
+			<h3 class="text title">{metadata.title}</h3>
+			<p class="text author">{metadata.author}</p>
+		</div>
+	</a>
 
-    <div class="details">
-      <h3 class="text title">{metadata.title}</h3>
-      <p class="text author">{metadata.author}</p>
-    </div>
-  </a>
-  
-  {#if percentage > 0.01 && percentage < 0.98}
-    <div class="percentage">
-      <progress value={percentage} max="1" class="bar"> {`${percentage * 100}%`} </progress>
-    </div>
-  {/if}
+	{#if percentage > 0.01 && percentage < 0.98}
+		<div class="percentage">
+			<progress value={percentage} max="1" class="bar"> {`${percentage * 100}%`} </progress>
+		</div>
+	{/if}
 </div>
 
-
 <style>
+	.book {
+		width: 100%;
+		aspect-ratio: 5.5/8.5 auto;
+		position: relative;
 
-  .book {
-    width: 100%;
-    aspect-ratio: 5.5/8.5 auto;
-    position: relative;
+		box-sizing: content-box;
 
-    box-sizing: content-box;
-    
-    padding: 0;
-    padding-left: 0px;
+		padding: 0;
+		padding-left: 0px;
 
-    background-color: black;
+		background-color: black;
 
-    border: none;
-    border-top-left-radius: 2px;
-    border-bottom-left-radius: 2px;
-    border-top-right-radius: 8px;
-    border-bottom-right-radius: 8px;
+		border: none;
+		border-top-left-radius: 2px;
+		border-bottom-left-radius: 2px;
+		border-top-right-radius: 8px;
+		border-bottom-right-radius: 8px;
 
-    box-shadow:
-      1px 1px 1px gray,
-      3px 1px white,
-      5px 3px black,
-      6px 4px 4px gray;
-    
-    background-size: contain;
+		box-shadow: 1px 1px 1px gray, 3px 1px white, 5px 3px black, 6px 4px 4px gray;
 
-    z-index: 0;
-    cursor: pointer;
+		background-size: contain;
 
-    transition: all 0.1s ease-in-out, z-index 0s 0.1s;
-  }
+		z-index: 0;
+		cursor: pointer;
 
-  .book:hover {
-    z-index: 10;
+		transition: all 0.1s ease-in-out, z-index 0s 0.1s;
+	}
 
-    box-shadow:
-      1px 1px 1px gray,
-      3px 1px white,
-      5px 3px black,
-      8px 6px 6px gray;
+	.book:hover {
+		z-index: 10;
 
-    transform: translateY(-15px) rotateZ(-2deg);
-  }
+		box-shadow: 1px 1px 1px gray, 3px 1px white, 5px 3px black, 8px 6px 6px gray;
 
-  .book:active {
-    box-shadow:
-      1px 1px 1px gray,
-      3px 1px white,
-      5px 3px black,
-      6px 4px 2px gray;
+		transform: translateY(-15px) rotateZ(-2deg);
+	}
 
-    filter: brightness(0.9)
-  }
+	.book:active {
+		box-shadow: 1px 1px 1px gray, 3px 1px white, 5px 3px black, 6px 4px 2px gray;
 
-  /* .book:hover .details {
+		filter: brightness(0.9);
+	}
+
+	/* .book:hover .details {
     width: 150px;
     background: rgba(75, 75, 75, 0.9);
   }
@@ -133,71 +111,69 @@
   }
    */
 
-  .details {
-    width: 100%;
-    height: 100%;
-    
-    padding-left: 10px;
-    padding-right: 10px;
-    padding-top: 15px;
-    padding-bottom: 15px;
+	.details {
+		width: 100%;
+		height: 100%;
 
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
+		padding-left: 10px;
+		padding-right: 10px;
+		padding-top: 15px;
+		padding-bottom: 15px;
 
-    background: rgba(75, 75, 75, 0.7);
-    border-radius: 6px;
-    border-top-left-radius: 2px;
-    border-bottom-left-radius: 2px;
+		display: flex;
+		flex-direction: column;
+		gap: 0.75rem;
 
-    transition: all 0.25s ease-in-out, z-index 1s 1s;
-  }
+		background: rgba(75, 75, 75, 0.7);
+		border-radius: 6px;
+		border-top-left-radius: 2px;
+		border-bottom-left-radius: 2px;
 
-  
-  .text {
-    width: 100%;
+		transition: all 0.25s ease-in-out, z-index 1s 1s;
+	}
 
-    margin: 0;
-    padding: 0;
+	.text {
+		width: 100%;
 
-    flex-grow: 0;
+		margin: 0;
+		padding: 0;
 
-    color: white;
-    text-align: center;
-    text-shadow: 2px 1px 2px black;
+		flex-grow: 0;
 
-    
-    overflow: hidden;
-    transition: all 0.25s ease-in-out;
-  }
-  
-  .title {
-    flex-grow: 1;
+		color: white;
+		text-align: center;
+		text-shadow: 2px 1px 2px black;
 
-    font-size: 1rem;
-    line-height: 1rem;
-  }
+		overflow: hidden;
+		transition: all 0.25s ease-in-out;
+	}
 
-  .author {
-    color: lightgray;
+	.title {
+		flex-grow: 1;
 
-    font-size: 0.75em;
-    line-height: 0.75rem;
-  }
+		font-size: 1rem;
+		line-height: 1rem;
+	}
 
-  .percentage {
-    position: absolute;
-    
-    bottom: -2px;
-    left: 4px;
-    right: 4px;
+	.author {
+		color: lightgray;
 
-    filter: drop-shadow(2px 1px 5px black);
-    z-index: 11;
-  }
+		font-size: 0.75em;
+		line-height: 0.75rem;
+	}
 
-  .bar {
-    width: 100%;
-  }
+	.percentage {
+		position: absolute;
+
+		bottom: -2px;
+		left: 4px;
+		right: 4px;
+
+		filter: drop-shadow(2px 1px 5px black);
+		z-index: 11;
+	}
+
+	.bar {
+		width: 100%;
+	}
 </style>

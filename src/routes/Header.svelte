@@ -2,7 +2,7 @@
 	import { page } from '$app/stores';
 	import NavLink from '$lib/buttons/NavLink.svelte';
 
-	$: reading = $page.url.pathname.includes('/read/')
+	$: reading = $page.url.pathname.includes('/read/');
 </script>
 
 <header class="flex justify-start items-baseline gap-8 my-6 mx-auto">
@@ -15,6 +15,8 @@
 		<ul class="flex gap-4">
 			<NavLink href="/">Home</NavLink>
 			<NavLink href="/books">Books</NavLink>
+			<NavLink href="/edit">Edit</NavLink>
+			<NavLink href="/about">About</NavLink>
 			<NavLink href="/edit/{$page.params.id}" hidden={!reading}>Edit this book!</NavLink>
 		</ul>
 	</nav>
