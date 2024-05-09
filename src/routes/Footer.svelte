@@ -4,16 +4,16 @@
 </script>
 
 <footer class="flex flex-col justify-center items-center gap-x-8 gap-y-4 p-8">
-	<ul class="flex gap-8">
+	<ul class="flex flex-wrap gap-8 justify-center">
 		<li>
 			<a href="/" class="flex gap-1 hover:text-amber-900"
-				><img src="favicon.jpg" alt="optiscape icon" class="w-5" />Optiscape</a
+				><img src="/favicon.jpg" alt="optiscape icon" class="w-5" />Optiscape</a
 			>
 		</li>
 		<li>
-			<a href="https://github.com/bklaing2/optiscape" class="flex gap-1 hover:text-amber-900"
-				><GithubLogo style="fill: gray;" />GitHub</a
-			>
+			<a href="https://github.com/bklaing2/optiscape" class="flex gap-1 hover:text-amber-900">
+				<GithubLogo style="fill: gray;" />GitHub
+			</a>
 		</li>
 		<li>
 			<a href="https://buymeacoffee.com/blaing" class="flex gap-1 hover:text-amber-900"

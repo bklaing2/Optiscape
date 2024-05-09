@@ -1,13 +1,14 @@
 import type { PageLoad } from './$types';
-import { getEpubLink } from '$lib/util/generateLink';
-import cfi from '$lib/util/cfi'
+import type { Book } from '$lib/types/types';
+import { DecodeEpubUrl } from '$lib/util/generateLink';
 import storage from '$lib/util/storage';
 import ePub from 'epubjs'
 
 export const ssr = false
 
 export const load: PageLoad = async ({ data, params, url }) => {
-  const epub = ePub(getEpubLink(params.id))
+  const epubUrl = DecodeEpubUrl(params.id)
+  const epub = ePub(epubUrl)
 
   await epub.ready
   await epub.locations.generate(1000)
@@ -23,11 +24,12 @@ export const load: PageLoad = async ({ data, params, url }) => {
     }
   }))
 
-  const metadata = {
-    id: epub.packaging.metadata.identifier,
+  const metadata: Book = {
+    id: params.id,
     title: epub.packaging.metadata.title,
     author: epub.packaging.metadata.creator,
-    coverUrl: await epub.coverUrl()
+    coverUrl: await epub.coverUrl() || '',
+    epubUrl
   }
 
   const history = storage.loadEditHistory()

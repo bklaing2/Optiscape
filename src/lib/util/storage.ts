@@ -7,14 +7,14 @@ export function loadHistory(): Book[] {
 }
 
 
-export function updateHistory(id: Book['id'], location: Book['location'], percentage: Book['percentage']) {
+export function updateHistory(book: Book, location: Book['location'], percentage: Book['percentage']) {
   if (!percentage || percentage < 0.01) return
 
   const history = loadHistory()
-  const index = history.findIndex(b => b.id === id)
+  const index = history.findIndex(b => b.id === book.id)
 
   if (index >= 0) history.splice(index, 1)
-  history.unshift({ id, location, percentage })
+  history.unshift({ ...book, location, percentage })
 
   localStorage.setItem('history', JSON.stringify(history))
 }

@@ -1,55 +1,35 @@
-<script lang="ts" context="module">
-	type BookMetadata = {
-		id: string;
-		title: string;
-		author: string;
-		coverUrl?: string | null;
-	};
-</script>
-
 <script lang="ts">
-	import { onMount } from 'svelte';
-	import ePub from 'epubjs';
 	import type { Book } from '$lib/types/types';
-	import { getEpubLink } from '$lib/util/generateLink';
 
-	export let book: Book = { id: '' };
+	export let book: Book;
 	export let edit = false;
+	export let showEditIcon = false;
 	export let height = 200;
 	export let className = '';
 
-	let metadata: BookMetadata = { id: '', title: '', author: '', coverUrl: null };
-
 	$: percentage = book.percentage ? book.percentage : -1;
 	$: href = `/${edit ? 'edit' : 'read'}/${book.id}`;
-
-	onMount(async () => {
-		const epub = ePub(getEpubLink(book.id));
-		await epub.ready;
-
-		const meta = epub.packaging.metadata;
-
-		metadata = {
-			id: meta.identifier,
-			title: meta.title,
-			author: meta.creator,
-			coverUrl: await epub.coverUrl()
-		};
-	});
 </script>
 
 <div class={`relative ${className}`}>
 	<a
 		{href}
 		class="book"
-		style:background-image={`url(${metadata.coverUrl})`}
+		style:background-image={`url(${book.coverUrl})`}
 		style:height={`${height}px`}
 	>
 		<div class="details">
-			<h3 class="text title">{metadata.title}</h3>
-			<p class="text author">{metadata.author}</p>
+			<h3 class="text title">{book.title}</h3>
+			<p class="text author">{book.author}</p>
 		</div>
 	</a>
+
+	<a
+		href="/edit/{book.id}"
+		style:display={showEditIcon ? undefined : 'none'}
+		class="absolute -bottom-2 -right-2 bg-white/30 rounded-full z-10 w-8 h-8 text-center align-middle flex items-center justify-center backdrop-blur-sm border border-amber-900/20 hover:backdrop-blur-3xl transition-all"
+		>✏️</a
+	>
 
 	{#if percentage > 0.01 && percentage < 0.98}
 		<div class="percentage">
@@ -84,7 +64,7 @@
 		z-index: 0;
 		cursor: pointer;
 
-		transition: all 0.1s ease-in-out, z-index 0s 0.1s;
+		transition: all 0.1s ease-in-out, z-index 0s 0.01s;
 	}
 
 	.book:hover {

@@ -21,7 +21,7 @@
 		console.log('Page turned', start, end);
 		location = start;
 		$page.url.searchParams.set('location', start);
-		updateHistory($page.params.id, start, epub.locations.percentageFromCfi(end));
+		updateHistory(metadata, start, epub.locations.percentageFromCfi(end));
 
 		// Update reading rate
 		handleReadingRate(start, end);
@@ -63,7 +63,7 @@
 		const [kfStart] = cfi.split(kf.start);
 		if (!cfi.inRange(kfStart, start, end)) return;
 
-		const offset = await cfi.countChars(start, kf.start, epub);
+		const offset = await cfi.countChars(start, kfStart, epub);
 		const delay = (offset / readingRate.Average) * 60000;
 
 		const t = setTimeout(() => {
@@ -92,7 +92,7 @@
 		const [, kfEnd] = cfi.split(kf.end);
 		if (!cfi.inRange(kfEnd, start, end)) return;
 
-		const offset = await cfi.countChars(start, kf.end, epub);
+		const offset = await cfi.countChars(start, kfEnd, epub);
 		const delay = (offset / readingRate.Average) * 60000;
 
 		const t = setTimeout(() => onEndKeyFrame(kf), delay);

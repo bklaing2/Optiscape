@@ -10,6 +10,7 @@ declare global {
 		interface Locals {
 			supabase: SupabaseClient<Database>;
 			safeGetSession: () => Promise<{ session: null; user: null; } | { session: Session; user: User | null; }>;
+			fetchBooks: (url: string) => Promise<Response>;
 		}
 		// interface PageData {}
 		// interface Platform {}
@@ -17,9 +18,9 @@ declare global {
 }
 
 declare namespace svelteHTML {
-  interface HTMLAttributes<T> {
-    'on:readerMouseDown'?: (event: any) => any;
-  }
+	interface HTMLAttributes<T> {
+		'on:readerMouseDown'?: (event: any) => any;
+	}
 }
 
-export {};
+export { };

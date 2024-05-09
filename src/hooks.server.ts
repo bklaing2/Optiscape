@@ -1,3 +1,4 @@
+import { STANDARD_EBOOKS_KEY } from '$env/static/private'
 import { PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_ANON_KEY } from '$env/static/public'
 import type { Handle } from '@sveltejs/kit'
 import { createServerClient } from '@supabase/ssr'
@@ -12,7 +13,7 @@ export const handle: Handle = async ({ event, resolve }) => {
     }
   })
 
-  
+
   const safeGetSession = async () => {
     const { data: { session } } = await supabase.auth.getSession()
     if (!session) return { session: null, user: null }
@@ -23,7 +24,10 @@ export const handle: Handle = async ({ event, resolve }) => {
     return { session, user }
   }
 
-  event.locals = { supabase, safeGetSession }
+
+  const fetchBooks = (url: string) => event.fetch(url, { headers: { 'User-Agent': STANDARD_EBOOKS_KEY } })
+
+  event.locals = { supabase, safeGetSession, fetchBooks }
 
   return resolve(event, {
     filterSerializedResponseHeaders(name) {
