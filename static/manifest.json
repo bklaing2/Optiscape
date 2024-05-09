@@ -1,0 +1,15 @@
+{
+  "name": "Optiscape",
+  "short_name": "Optiscape",
+  "description": "Ebooks enhanced with audio",
+  "start_url": "/",
+  "icons": [{
+    "src": "favicon.png",
+    "type": "image/png",
+    "sizes": "512x512"
+  }],
+  "theme_color": "#000000",
+  "background_color": "#ffffff",
+  "display": "standalone",
+  "scope": "/"
+}
