@@ -4,7 +4,7 @@
 	import { page } from '$app/stores';
 
 	export let data: PageData;
-	$: ({ books } = data);
+	$: ({ streamed } = data);
 	$: searchParams = $page.url.searchParams;
 	$: showEditIcon = searchParams.has('edit');
 	$: query = searchParams.get('query');
@@ -23,8 +23,12 @@
 	/>
 </form>
 
-{#if books.length > 0}
-	<BookList {books} height={180} {showEditIcon} className="flex-wrap justify-center" />
-{:else}
-	<!-- <p>No books found</p> -->
-{/if}
+{#await streamed.books}
+	Loading books...
+{:then books}
+	{#if books.length > 0}
+		<BookList {books} height={180} {showEditIcon} className="flex-wrap justify-center" />
+	{:else}
+		<!-- <p>No books found</p> -->
+	{/if}
+{/await}

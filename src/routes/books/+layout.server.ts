@@ -12,10 +12,10 @@ export const load: LayoutServerLoad = async ({ locals, url }) => {
   const category = searchParams.get('category') || ''
   const filter = searchParams.get('filter') || ''
 
-  const categories = await FetchCategories()
-  const entries = await FetchEntries(category)
+  const categories = FetchCategories()
+  const entries = FetchEntries(category)
 
-  return { categories, entries }
+  return { streamed: { categories, entries } }
 
 
   async function FetchCategories() {

@@ -14,9 +14,7 @@ export const load: PageServerLoad = async ({ locals, url }) => {
   const entry = searchParams.get('entry') || ''
   const query = searchParams.get('query') || ''
 
-  const books = await FetchBooks(category, entry)
-
-  return { books }
+  return { streamed: { books: FetchBooks(category, entry) } }
 
 
   async function FetchBooks(category: string, entry: string) {

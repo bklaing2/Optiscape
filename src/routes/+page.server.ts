@@ -10,13 +10,17 @@ import { EntryToBook } from '$lib/util/misc';
 export const load: PageServerLoad = async ({ locals }) => {
   const { fetchBooks } = locals
 
-  const response = await fetchBooks(`https://standardebooks.org/feeds/opds/all`)
-  if (response.status !== 200) error(response.status, response.statusText)
+  return { streamed: { optiscapes: GetBooks() } }
 
-  const xmlDom = new xmldom.DOMParser().parseFromString(await response.text())
-  if (!xmlDom || !xmlDom.documentElement) error(500, 'Error parsing XML')
 
-  const feed = XML.deserialize<OPDS>(xmlDom, OPDS);
+  async function GetBooks() {
+    const response = await fetchBooks(`https://standardebooks.org/feeds/opds/all`)
+    if (response.status !== 200) error(response.status, response.statusText)
 
-  return { optiscapes: feed.Entries.slice(0, 10).map(EntryToBook) }
+    const xmlDom = new xmldom.DOMParser().parseFromString(await response.text())
+    if (!xmlDom || !xmlDom.documentElement) error(500, 'Error parsing XML')
+
+    const feed = XML.deserialize<OPDS>(xmlDom, OPDS);
+    return feed.Entries.slice(0, 10).map(EntryToBook)
+  }
 };

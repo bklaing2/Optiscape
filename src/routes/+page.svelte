@@ -6,7 +6,7 @@
 	import SeeAll from '$lib/buttons/SeeAll.svelte';
 
 	export let data: PageData;
-	$: ({ currentlyReading, history = [], optiscapes = [] } = data);
+	$: ({ currentlyReading, history = [], streamed } = data);
 </script>
 
 <svelte:head>
@@ -38,7 +38,11 @@
 	<div id="books-see-all" class="justify-self-end"><SeeAll href="/books" /></div>
 
 	<div id="books">
-		<BookList books={optiscapes} height={181} />
+		{#await streamed.optiscapes}
+			Loading books...
+		{:then optiscapes}
+			<BookList books={optiscapes} height={181} />
+		{/await}
 	</div>
 </div>
 
