@@ -5,19 +5,21 @@ import type { Database } from "$lib/types/database";
 import Tokens from "./tokens";
 
 
-async function Supabase (cookies: Cookies) {
+async function Supabase(cookies: Cookies) {
   const supabase = createServerClient<Database>(process.env.SUPABASE_URL!, process.env.SUPABASE_ANON_KEY!, {
     cookies: {
       get: (key) => cookies.get(key),
       set: (key, value, options) => cookies.set(key, value, { ...options, secure: process.env.ENV! !== 'DEV' }),
       remove: (key, options) => cookies.delete(key, { ...options, secure: process.env.ENV! !== 'DEV' })
-    }
+    },
+    db: { schema: 'optiscape' }
+
   })
 
   return supabase
 }
 
-export function Service () {
+export function Service() {
   return createServerClient<Database>(process.env.SUPABASE_URL!, process.env.SUPABASE_SERVICE_KEY!, {
     cookies: {
       get: undefined,
